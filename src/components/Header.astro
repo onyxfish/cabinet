@@ -1,6 +1,6 @@
 ---
 interface Props {
-  currentPage?: 'collection' | 'timeline' | 'browse' | 'about';
+  currentPage?: 'collection' | 'timeline' | 'about';
 }
 const { currentPage } = Astro.props;
 ---
@@ -11,7 +11,6 @@ const { currentPage } = Astro.props;
   <nav>
     <a href="/" class:list={['nav-link', { active: currentPage === 'collection' }]}>Collection</a>
     <a href="/timeline" class:list={['nav-link', { active: currentPage === 'timeline' }]}>Timeline</a>
-    <a href="/browse" class:list={['nav-link', { active: currentPage === 'browse' }]}>Browse</a>
     <a href="/about" class:list={['nav-link', { active: currentPage === 'about' }]}>About</a>
   </nav>
 

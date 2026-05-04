@@ -4,7 +4,9 @@
   interface Work {
     id: string;
     title: string;
+    titleTrans?: string | null;
     artist: string;
+    after: string[];
     medium: string[];
     yearCreated: string;
     sortYear: number;
@@ -23,17 +25,33 @@
   );
 
   let activeFilter = $state('All');
+  let query = $state('');
 
-  const filtered: Work[] = $derived(
-    activeFilter === 'All'
-      ? works
-      : works.filter(w => w.medium.includes(activeFilter))
-  );
+  const filtered: Work[] = $derived((() => {
+    const q = query.trim().toLowerCase();
+    return works.filter(w => {
+      const matchesMedium = activeFilter === 'All' || w.medium.includes(activeFilter);
+      if (!matchesMedium) return false;
+      if (!q) return true;
+      return (
+        w.title.toLowerCase().includes(q) ||
+        (w.titleTrans?.toLowerCase().includes(q) ?? false) ||
+        w.artist.toLowerCase().includes(q) ||
+        w.after.some(a => a.toLowerCase().includes(q))
+      );
+    });
+  })());
 
 </script>
 
 <div>
   <div class="filter-bar">
+    <input
+      class="search-input"
+      type="search"
+      placeholder="Search artist, title…"
+      bind:value={query}
+    />
     <span class="filter-label">Medium</span>
     {#each ['All', ...allMedia] as medium (medium)}
       <button
@@ -63,6 +81,31 @@
     gap: 6px;
     flex-wrap: wrap;
   }
+
+  .search-input {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 2px 0;
+    width: 180px;
+    outline: none;
+    margin-right: 16px;
+    transition: border-color 0.15s;
+  }
+
+  .search-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .search-input:focus {
+    border-bottom-color: var(--accent);
+  }
+
+  /* Hide browser-native clear button on search inputs */
+  .search-input::-webkit-search-cancel-button { display: none; }
 
   .filter-label {
     font-family: var(--sans);
