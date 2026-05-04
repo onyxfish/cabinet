@@ -316,7 +316,7 @@
     align-items: center;
     gap: 8px;
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-dim);
@@ -367,7 +367,7 @@
     bottom: 12px;
     right: 12px;
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-faint);
@@ -412,7 +412,7 @@
 
   .view-btn {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 5px 14px;
@@ -442,7 +442,7 @@
 
   .work-title {
     font-family: var(--serif);
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 400;
     font-style: italic;
     color: var(--text);
@@ -451,14 +451,14 @@
 
   .work-title-alt {
     font-family: var(--serif);
-    font-size: 16px;
+    font-size: 18px;
     color: var(--text-dim);
     font-style: italic;
   }
 
   .work-title-trans {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-faint);
     letter-spacing: 0.04em;
   }
@@ -467,19 +467,19 @@
 
   .artist-name {
     font-family: var(--serif);
-    font-size: 18px;
+    font-size: 20px;
     color: var(--text);
   }
 
   .artist-life {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-dim);
   }
 
   .after-line {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-dim);
     font-style: italic;
     margin-top: 2px;
@@ -501,7 +501,7 @@
 
   .meta-label {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-faint);
@@ -509,14 +509,14 @@
 
   .meta-value {
     font-family: var(--sans);
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text);
     line-height: 1.5;
   }
 
   .meta-sub {
     color: var(--text-dim);
-    font-size: 12px;
+    font-size: 14px;
   }
 
   /* Lightbox */
@@ -546,7 +546,7 @@
     cursor: pointer;
     color: rgba(255, 255, 255, 0.5);
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     transition: color 0.15s;

@@ -84,7 +84,7 @@
 
   .search-input {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text);
     background: transparent;
     border: none;
@@ -109,7 +109,7 @@
 
   .filter-label {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-faint);
@@ -118,7 +118,7 @@
 
   .filter-chip {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.07em;
     text-transform: uppercase;
     padding: 3px 11px;
@@ -143,7 +143,7 @@
   .work-count {
     margin-left: auto;
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-faint);
   }
 

@@ -74,13 +74,13 @@
 
   .group-label {
     font-family: var(--serif);
-    font-size: 18px;
+    font-size: 20px;
     font-style: italic;
   }
 
   .group-count {
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-faint);
     letter-spacing: 0.06em;
   }

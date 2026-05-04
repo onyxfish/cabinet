@@ -144,7 +144,7 @@
     width: 100%;
     text-align: left;
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 5px 0;
@@ -184,7 +184,7 @@
 
   .decade-label {
     font-family: var(--serif);
-    font-size: 44px;
+    font-size: 50px;
     font-weight: 300;
     color: var(--border);
     line-height: 1;
@@ -193,7 +193,7 @@
   }
 
   .decade-label.undated {
-    font-size: 24px;
+    font-size: 28px;
     font-style: italic;
     letter-spacing: 0;
   }
@@ -206,7 +206,7 @@
 
   .decade-count {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.07em;
     text-transform: uppercase;
     color: var(--text-faint);
@@ -221,6 +221,6 @@
   @media (max-width: 768px) {
     .jump-nav { display: none; }
     .sections { padding: 24px 20px; }
-    .decade-label { font-size: 32px; }
+    .decade-label { font-size: 36px; }
   }
 </style>

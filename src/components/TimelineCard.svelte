@@ -65,7 +65,7 @@
 
   .title {
     font-family: var(--serif);
-    font-size: 13px;
+    font-size: 15px;
     font-style: italic;
     color: #f0ebe3;
     line-height: 1.25;
@@ -75,7 +75,7 @@
 
   .artist {
     font-family: var(--sans);
-    font-size: 9px;
+    font-size: 11px;
     color: rgba(240, 235, 227, 0.65);
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -86,7 +86,7 @@
     top: 8px;
     left: 8px;
     font-family: var(--sans);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     background: rgba(244, 239, 232, 0.88);
     color: var(--text-dim);

@@ -109,7 +109,7 @@
 
   .overlay-title {
     font-family: var(--serif);
-    font-size: 15px;
+    font-size: 17px;
     font-style: italic;
     color: #f0ebe3;
     line-height: 1.3;
@@ -118,7 +118,7 @@
 
   .overlay-meta {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     color: rgba(240, 235, 227, 0.7);
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -135,7 +135,7 @@
 
   .ph-title {
     font-family: var(--serif);
-    font-size: 15px;
+    font-size: 17px;
     font-style: italic;
     line-height: 1.3;
     margin-bottom: 4px;
@@ -144,7 +144,7 @@
 
   .ph-meta {
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     transition: color 0.3s;
@@ -159,7 +159,7 @@
     top: 10px;
     right: 10px;
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     color: var(--text-faint);
     transition: opacity 0.2s;

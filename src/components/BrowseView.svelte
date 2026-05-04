@@ -79,7 +79,7 @@
 
   .tab {
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 10px 20px;

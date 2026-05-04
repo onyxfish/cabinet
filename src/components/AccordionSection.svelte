@@ -45,7 +45,7 @@
     border: none;
     cursor: pointer;
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-dim);
