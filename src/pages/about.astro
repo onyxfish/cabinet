@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+---
+
+<Base title="About" description="About the Cabinet collection.">
+  <Header currentPage="about" />
+  <main class="about-page">
+    <div class="about-content">
+      <h1>Cabinet</h1>
+      <p>
+        A personal collection of prints and drawings assembled over many years,
+        spanning the sixteenth through twentieth centuries. The works are primarily
+        European, with a concentration in French and Dutch printmaking of the
+        seventeenth and eighteenth centuries.
+      </p>
+      <p>
+        The collection is organized around recurring interests: landscape and
+        topography, the figure in motion, ornament and design, and the technical
+        achievements of the great printmaking traditions — etching, engraving,
+        mezzotint, and aquatint.
+      </p>
+      <p>
+        Works are catalogued with artist, date, medium, dimensions, and — where
+        applicable — references to standard catalogue raisonnés.
+      </p>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .about-page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px 32px;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+    margin: 0 0 40px;
+  }
+
+  p {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0 0 24px;
+  }
+</style>

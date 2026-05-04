@@ -51,8 +51,14 @@
   type ImageView = { key: string; label: string; images: ImageSize[] };
   const imageViews: ImageView[] = $derived((() => {
     const views: ImageView[] = [];
-    if (work.images.display.length > 0)   views.push({ key: 'display',   label: 'View',       images: work.images.display });
-    if (work.images.recto.length > 0)     views.push({ key: 'recto',     label: 'Recto',      images: work.images.recto });
+    if (work.images.display.length > 0)   views.push({ key: 'display',   label: 'Image',      images: work.images.display });
+
+    // Skip recto if it duplicates the display image
+    const rectoIsDupe = work.images.recto.length > 0 &&
+      work.images.display.length > 0 &&
+      work.images.recto[0].display === work.images.display[0].display;
+    if (work.images.recto.length > 0 && !rectoIsDupe) views.push({ key: 'recto', label: 'Recto', images: work.images.recto });
+
     if (work.images.verso.length > 0)     views.push({ key: 'verso',     label: 'Verso',      images: work.images.verso });
     if (work.images.plateSig.length > 0)  views.push({ key: 'plateSig',  label: 'Plate Sig.', images: work.images.plateSig });
     if (work.images.handSig.length > 0)   views.push({ key: 'handSig',   label: 'Hand Sig.',  images: work.images.handSig });
@@ -194,10 +200,14 @@
         {#if work.artistLife}
           <div class="artist-life">{work.artistLife}</div>
         {/if}
-        {#if work.after.length > 0}
-          <div class="after-line">d'après {work.after.join(', ')}</div>
-        {/if}
       </div>
+
+      {#if work.after.length > 0}
+        <div class="artist-block">
+          <div class="meta-label">After</div>
+          <div class="artist-name">{work.after.join(', ')}</div>
+        </div>
+      {/if}
 
       <div class="divider"></div>
 

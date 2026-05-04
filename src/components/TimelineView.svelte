@@ -19,33 +19,47 @@
 
   const byDecade: [string, Work[]][] = $derived((() => {
     const sorted = [...works].sort((a, b) => a.sortYear - b.sortYear);
-    const map = new Map<string, Work[]>();
+    const workMap = new Map<string, Work[]>();
     const undated: Work[] = [];
     for (const w of sorted) {
       if (!w.sortYear) { undated.push(w); continue; }
       const key = `${Math.floor(w.sortYear / 10) * 10}s`;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(w);
+      if (!workMap.has(key)) workMap.set(key, []);
+      workMap.get(key)!.push(w);
     }
-    const entries = [...map.entries()];
+
+    // Fill every decade between min and max, even if empty
+    const datedWorks = sorted.filter(w => w.sortYear > 0);
+    const entries: [string, Work[]][] = [];
+    if (datedWorks.length > 0) {
+      const minDecade = Math.floor(datedWorks[0].sortYear / 10) * 10;
+      const maxDecade = Math.floor(datedWorks[datedWorks.length - 1].sortYear / 10) * 10;
+      for (let d = minDecade; d <= maxDecade; d += 10) {
+        const key = `${d}s`;
+        entries.push([key, workMap.get(key) ?? []]);
+      }
+    }
+
     if (undated.length > 0) entries.push(['Undated', undated]);
     return entries;
   })());
 
   const decades = $derived(byDecade.map(([d]) => d));
+  const populatedDecades = $derived(byDecade.filter(([, ws]) => ws.length > 0).map(([d]) => d));
 
   let activeDecade = $state('');
   let sectionRefs: Record<string, HTMLElement | undefined> = {};
 
   onMount(() => {
     // Set initial active decade
-    if (decades.length > 0) activeDecade = decades[0];
+    if (populatedDecades.length > 0) activeDecade = populatedDecades[0];
 
     const obs = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) {
-            activeDecade = (e.target as HTMLElement).dataset.decade ?? '';
+            const d = (e.target as HTMLElement).dataset.decade ?? '';
+            if (populatedDecades.includes(d)) activeDecade = d;
           }
         }
       },
@@ -70,7 +84,7 @@
 <div class="timeline-root">
   <!-- Sticky decade jump nav -->
   <div class="jump-nav">
-    {#each decades as decade (decade)}
+    {#each populatedDecades as decade (decade)}
       <button
         class="jump-btn"
         class:active={activeDecade === decade}

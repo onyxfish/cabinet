@@ -41,7 +41,7 @@
             src={work.images.display[0]?.thumb}
             artist={work.artist}
             title={work.title}
-            style="width: 120px; height: 120px; object-fit: cover; display: block;"
+            style="width: 120px; height: 120px; object-fit: contain; background: var(--bg3); display: block;"
           />
         </a>
       {/each}
