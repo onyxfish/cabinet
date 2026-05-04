@@ -33,6 +33,7 @@ const works = defineCollection({
     titleTrans: z.string().optional().nullable(),
     artist: z.string(),
     artistLife: z.string().optional().nullable(),
+    artistNationality: z.string().optional().nullable(),
     after: z.array(z.string()).default([]),
     medium: z.array(z.string()).default([]),
     support: z.string().optional().nullable(),

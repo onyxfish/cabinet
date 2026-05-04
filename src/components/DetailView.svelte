@@ -16,6 +16,7 @@
     titleTrans?: string | null;
     artist: string;
     artistLife?: string | null;
+    artistNationality?: string | null;
     after: string[];
     medium: string[];
     support?: string | null;
@@ -197,6 +198,9 @@
       <div class="artist-block">
         <div class="meta-label">Artist</div>
         <div class="artist-name">{work.artist}</div>
+        {#if work.artistNationality}
+          <div class="artist-life">{work.artistNationality}</div>
+        {/if}
         {#if work.artistLife}
           <div class="artist-life">{work.artistLife}</div>
         {/if}

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import WorkImage from './WorkImage.svelte';
-
   interface Work {
     id: string;
     title: string;
@@ -18,31 +16,44 @@
   let { work, onSelect }: Props = $props();
   let hovered = $state(false);
 
+  const thumb = $derived(work.images.display[0]?.thumb);
+  const hasImage = $derived(!!thumb);
   const displayTitle = work.title.replace(/^[""]|[""]$/g, '');
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
 <div
   class="card"
+  class:is-placeholder={!hasImage}
   onclick={onSelect}
   onmouseenter={() => hovered = true}
   onmouseleave={() => hovered = false}
 >
-  <WorkImage
-    src={work.images.display[0]?.thumb}
-    artist={work.artist}
-    title={work.title}
-    style="width: 100%; height: auto; display: block; transform: {hovered ? 'scale(1.02)' : 'scale(1)'}; transition: transform 0.5s cubic-bezier(0.25,0,0,1);"
-  />
+  {#if hasImage}
+    <img
+      src={thumb}
+      alt="{displayTitle} — {work.artist}"
+      class="card-img"
+      style="transform: {hovered ? 'scale(1.02)' : 'scale(1)'}; transition: transform 0.5s cubic-bezier(0.25,0,0,1);"
+      loading="lazy"
+    />
+    <div class="year-badge" style="opacity: {hovered ? 0 : 0.7}">{work.yearCreated}</div>
+  {:else}
+    <div class="card-stripe"></div>
+    <div class="ph-label">
+      <div class="ph-title" style="color: {hovered ? '#f0ebe3' : 'var(--text-dim)'}">{displayTitle}</div>
+      <div class="ph-meta" style="color: {hovered ? 'rgba(240,235,227,0.7)' : 'var(--text-faint)'}">{work.artist}</div>
+    </div>
+  {/if}
 
-  <!-- Hover overlay -->
-  <div class="overlay" style="opacity: {hovered ? 1 : 0}">
-    <div class="overlay-title">{displayTitle}</div>
-    <div class="overlay-meta">{work.artist} · {work.yearCreated}</div>
-  </div>
-
-  <!-- Year badge -->
-  <div class="year-badge" style="opacity: {hovered ? 0 : 0.7}">{work.yearCreated}</div>
+  {#if hasImage}
+    <div class="overlay" style="opacity: {hovered ? 1 : 0}">
+      <div class="overlay-title">{displayTitle}</div>
+      <div class="overlay-meta">{work.artist}{work.yearCreated ? ` · ${work.yearCreated}` : ''}</div>
+    </div>
+  {:else}
+    <div class="overlay overlay-ph" style="opacity: {hovered ? 1 : 0}"></div>
+  {/if}
 </div>
 
 <style>
@@ -54,7 +65,35 @@
     overflow: hidden;
     background: var(--bg2);
     display: block;
-    min-height: 180px;
+  }
+
+  .card.is-placeholder {
+    aspect-ratio: 3 / 4;
+  }
+
+  .card-img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .card-stripe {
+    position: absolute;
+    inset: 0;
+    background: var(--bg3);
+  }
+
+  .card-stripe::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      rgba(0, 0, 0, 0.025) 10px,
+      rgba(0, 0, 0, 0.025) 11px
+    );
   }
 
   .overlay {
@@ -83,6 +122,36 @@
     color: rgba(240, 235, 227, 0.7);
     letter-spacing: 0.06em;
     text-transform: uppercase;
+  }
+
+  .ph-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 12px;
+    z-index: 1;
+  }
+
+  .ph-title {
+    font-family: var(--serif);
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    transition: color 0.3s;
+  }
+
+  .ph-meta {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .overlay-ph {
+    pointer-events: none;
   }
 
   .year-badge {

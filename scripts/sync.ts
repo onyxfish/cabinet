@@ -120,14 +120,14 @@ function toStringArray(val: unknown): string[] {
 
 // ─── Artist Lookup ───────────────────────────────────────────────────────────
 
-const artistCache: Record<string, { life: string | null }> = {};
+const artistCache: Record<string, { life: string | null; nationality: string | null }> = {};
 
-function lookupArtist(name: string): { life: string | null } {
+function lookupArtist(name: string): { life: string | null; nationality: string | null } {
   if (artistCache[name]) return artistCache[name];
 
   const filePath = path.join(ARTISTS_DIR, `${name}.md`);
   if (!fs.existsSync(filePath)) {
-    artistCache[name] = { life: null };
+    artistCache[name] = { life: null, nationality: null };
     return artistCache[name];
   }
 
@@ -138,7 +138,9 @@ function lookupArtist(name: string): { life: string | null } {
   if (born || died) {
     life = [born, died].filter(Boolean).join('–');
   }
-  artistCache[name] = { life };
+  const natArr = toStringArray(data['Nationality'] ?? data['nationality']);
+  const nationality = natArr.length > 0 ? natArr[0] : null;
+  artistCache[name] = { life, nationality };
   return artistCache[name];
 }
 
@@ -270,7 +272,7 @@ async function main() {
     const artistName = artistWikilinks.length > 0
       ? extractWikilinkName(artistWikilinks[0])
       : 'Unknown';
-    const { life: artistLife } = lookupArtist(artistName);
+    const { life: artistLife, nationality: artistNationality } = lookupArtist(artistName);
 
     const slug = makeSlug(artistName, title, seenSlugs);
     process.stdout.write(`  [${workNum}/${total}] ${slug} `);
@@ -330,6 +332,7 @@ async function main() {
       titleTrans: data['Title Trans.'] ?? null,
       artist: artistName,
       artistLife: artistLife ?? null,
+      artistNationality: artistNationality ?? null,
       after,
       medium,
       support: data['Support'] ?? null,
