@@ -7,16 +7,15 @@
     artist: string;
     medium: string[];
     yearCreated: string;
-    images: { display: string[] };
+    images: { display: { thumb: string; display: string; zoom: string }[] };
   }
 
   interface Props {
     work: Work;
-    tall: boolean;
     onSelect: () => void;
   }
 
-  let { work, tall, onSelect }: Props = $props();
+  let { work, onSelect }: Props = $props();
   let hovered = $state(false);
 
   const displayTitle = work.title.replace(/^[""]|[""]$/g, '');
@@ -30,10 +29,10 @@
   onmouseleave={() => hovered = false}
 >
   <WorkImage
-    src={work.images.display[0]}
+    src={work.images.display[0]?.thumb}
     artist={work.artist}
     title={work.title}
-    style="width: 100%; height: {tall ? 320 : 220}px; object-fit: cover; display: block; transform: {hovered ? 'scale(1.02)' : 'scale(1)'}; transition: transform 0.5s cubic-bezier(0.25,0,0,1);"
+    style="width: 100%; height: auto; display: block; transform: {hovered ? 'scale(1.02)' : 'scale(1)'}; transition: transform 0.5s cubic-bezier(0.25,0,0,1);"
   />
 
   <!-- Hover overlay -->
@@ -55,6 +54,7 @@
     overflow: hidden;
     background: var(--bg2);
     display: block;
+    min-height: 180px;
   }
 
   .overlay {

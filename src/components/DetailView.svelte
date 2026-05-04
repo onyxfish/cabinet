@@ -30,13 +30,13 @@
     catNum?: string | null;
     catPage?: number | null;
     images: {
-      display: string[];
-      recto: string[];
-      verso: string[];
-      plateSig: string[];
-      handSig: string[];
-      watermark: string[];
-      other: string[];
+      display: { thumb: string; display: string; zoom: string }[];
+      recto: { thumb: string; display: string; zoom: string }[];
+      verso: { thumb: string; display: string; zoom: string }[];
+      plateSig: { thumb: string; display: string; zoom: string }[];
+      handSig: { thumb: string; display: string; zoom: string }[];
+      watermark: { thumb: string; display: string; zoom: string }[];
+      other: { thumb: string; display: string; zoom: string }[];
     };
   }
 
@@ -47,15 +47,16 @@
   let { work }: Props = $props();
 
   // Build available image views
-  type ImageView = { key: string; label: string; urls: string[] };
+  type ImageSize = { thumb: string; display: string; zoom: string };
+  type ImageView = { key: string; label: string; images: ImageSize[] };
   const imageViews: ImageView[] = $derived((() => {
     const views: ImageView[] = [];
-    if (work.images.display.length > 0)   views.push({ key: 'display',   label: 'View',      urls: work.images.display });
-    if (work.images.recto.length > 0)     views.push({ key: 'recto',     label: 'Recto',     urls: work.images.recto });
-    if (work.images.verso.length > 0)     views.push({ key: 'verso',     label: 'Verso',     urls: work.images.verso });
-    if (work.images.plateSig.length > 0)  views.push({ key: 'plateSig',  label: 'Plate Sig.', urls: work.images.plateSig });
-    if (work.images.handSig.length > 0)   views.push({ key: 'handSig',   label: 'Hand Sig.', urls: work.images.handSig });
-    if (work.images.watermark.length > 0) views.push({ key: 'watermark', label: 'Watermark', urls: work.images.watermark });
+    if (work.images.display.length > 0)   views.push({ key: 'display',   label: 'View',       images: work.images.display });
+    if (work.images.recto.length > 0)     views.push({ key: 'recto',     label: 'Recto',      images: work.images.recto });
+    if (work.images.verso.length > 0)     views.push({ key: 'verso',     label: 'Verso',      images: work.images.verso });
+    if (work.images.plateSig.length > 0)  views.push({ key: 'plateSig',  label: 'Plate Sig.', images: work.images.plateSig });
+    if (work.images.handSig.length > 0)   views.push({ key: 'handSig',   label: 'Hand Sig.',  images: work.images.handSig });
+    if (work.images.watermark.length > 0) views.push({ key: 'watermark', label: 'Watermark',  images: work.images.watermark });
     return views;
   })());
 
@@ -66,7 +67,7 @@
   const activeView: ImageView | undefined = $derived(
     imageViews.find(v => v.key === activeViewKey) ?? imageViews[0]
   );
-  const activeUrl: string = $derived(activeView?.urls[activeImageIndex] ?? '');
+  const activeImage: ImageSize | undefined = $derived(activeView?.images[activeImageIndex]);
   const hasImages: boolean = $derived(imageViews.length > 0);
 
   function setView(key: string) {
@@ -118,11 +119,11 @@
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
         <div
           class="main-image-wrap"
-          onclick={() => { if (activeUrl) lightboxOpen = true; }}
-          style="cursor: {activeUrl ? 'zoom-in' : 'default'}"
+          onclick={() => { if (activeImage) lightboxOpen = true; }}
+          style="cursor: {activeImage ? 'zoom-in' : 'default'}"
         >
-          {#if activeUrl}
-            <img src={activeUrl} alt={displayTitle} class="main-image" />
+          {#if activeImage}
+            <img src={activeImage.display} alt={displayTitle} class="main-image" />
             <span class="enlarge-hint">Click to enlarge</span>
           {:else}
             <div class="img-ph main-ph">
@@ -135,15 +136,15 @@
         </div>
 
         <!-- Thumbnail strip for multi-image views -->
-        {#if (activeView?.urls.length ?? 0) > 1}
+        {#if (activeView?.images.length ?? 0) > 1}
           <div class="multi-thumbs">
-            {#each (activeView?.urls ?? []) as url, i (i)}
+            {#each (activeView?.images ?? []) as img, i (i)}
               <button
                 class="multi-thumb"
                 class:active={activeImageIndex === i}
                 onclick={() => activeImageIndex = i}
               >
-                <img src={url} alt="View {i + 1}" />
+                <img src={img.thumb} alt="View {i + 1}" />
               </button>
             {/each}
           </div>
@@ -284,7 +285,7 @@
 {#if lightboxOpen}
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
   <div class="lightbox" onclick={() => lightboxOpen = false}>
-    <img src={activeUrl} alt={displayTitle} class="lightbox-img" />
+    <img src={activeImage?.zoom} alt={displayTitle} class="lightbox-img" />
     <button class="lightbox-close" onclick={(e) => { e.stopPropagation(); lightboxOpen = false; }}>Close</button>
   </div>
 {/if}

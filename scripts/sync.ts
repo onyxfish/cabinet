@@ -61,6 +61,30 @@ function saveManifest(manifest: Manifest) {
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2));
 }
 
+// ─── Slug Generation ─────────────────────────────────────────────────────────
+
+function slugify(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')   // strip combining diacritics
+    .toLowerCase()
+    .replace(/['"''""\[\]]/g, '')      // strip quotes and brackets
+    .replace(/[^a-z0-9]+/g, '-')      // non-alphanumeric → hyphen
+    .replace(/^-+|-+$/g, '');         // trim leading/trailing hyphens
+}
+
+function makeSlug(artist: string, title: string, seen: Set<string>): string {
+  const a = slugify(artist === 'Unknown' ? '' : artist);
+  const t = slugify(title);
+  let base = a ? `${a}-${t}` : t;
+  if (!base) base = 'untitled';
+  let slug = base;
+  let n = 2;
+  while (seen.has(slug)) slug = `${base}-${n++}`;
+  seen.add(slug);
+  return slug;
+}
+
 // ─── Wikilink Parsing ────────────────────────────────────────────────────────
 
 function extractWikilinkName(raw: string): string {
@@ -120,6 +144,14 @@ function lookupArtist(name: string): { life: string | null } {
 
 // ─── Image Upload ─────────────────────────────────────────────────────────────
 
+export type ImageSizes = { thumb: string; display: string; zoom: string };
+
+const IMAGE_VARIANTS = [
+  { size: 'thumb',   maxPx: 500,  quality: 80 },
+  { size: 'display', maxPx: 1400, quality: 82 },
+  { size: 'zoom',    maxPx: 2800, quality: 88 },
+] as const;
+
 const hasR2 = !!(
   process.env.R2_ACCOUNT_ID &&
   process.env.R2_ACCESS_KEY_ID &&
@@ -132,23 +164,24 @@ if (!hasR2) {
   console.warn('⚠️  R2 env vars not set — images will be skipped. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL in .env');
 }
 
-async function uploadImage(
+async function uploadVariant(
   localPath: string,
   r2Key: string,
-  manifest: Manifest
+  maxPx: number,
+  quality: number,
+  manifestKey: string,
+  manifest: Manifest,
+  stat: fs.Stats
 ): Promise<string> {
-  const stat = fs.statSync(localPath);
-  const cached = manifest[localPath];
-
+  const cached = manifest[manifestKey];
   if (cached && cached.mtime === stat.mtimeMs) {
     return cached.url;
   }
 
-  // Resize with sharp
   const buf = await sharp(localPath)
-    .rotate() // auto-orient from EXIF
-    .resize({ width: 1400, height: 1400, fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: 82 })
+    .rotate()
+    .resize({ width: maxPx, height: maxPx, fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality })
     .toBuffer();
 
   await s3.send(new PutObjectCommand({
@@ -160,42 +193,39 @@ async function uploadImage(
   }));
 
   const url = `${R2_PUBLIC_URL.replace(/\/$/, '')}/${r2Key}`;
-  manifest[localPath] = { url, mtime: stat.mtimeMs };
+  manifest[manifestKey] = { url, mtime: stat.mtimeMs };
   return url;
 }
 
 async function resolveImages(
   wikilinkArray: string[],
-  notionId: string,
+  slug: string,
   typeKey: string,
   manifest: Manifest,
   stats: { uploaded: number; skipped: number }
-): Promise<string[]> {
-  const urls: string[] = [];
+): Promise<ImageSizes[]> {
+  const results: ImageSizes[] = [];
   for (let i = 0; i < wikilinkArray.length; i++) {
-    const wikilink = wikilinkArray[i];
-    const localPath = resolveImagePath(wikilink);
+    const localPath = resolveImagePath(wikilinkArray[i]);
     if (!localPath) continue;
+    if (!hasR2) continue;
 
-    if (!hasR2) {
-      continue; // skip — no R2 configured
-    }
-
-    const ext = path.extname(localPath).toLowerCase().replace('.', '') || 'jpg';
-    const r2Key = `works/${notionId}/${typeKey}-${i}.jpg`;
     const stat = fs.statSync(localPath);
-    const cached = manifest[localPath];
+    const sizes: Partial<ImageSizes> = {};
 
-    if (cached && cached.mtime === stat.mtimeMs) {
-      urls.push(cached.url);
-      stats.skipped++;
-    } else {
-      const url = await uploadImage(localPath, r2Key, manifest);
-      urls.push(url);
-      stats.uploaded++;
+    for (const { size, maxPx, quality } of IMAGE_VARIANTS) {
+      const r2Key = `works/${slug}/${typeKey}-${i}-${size}.jpg`;
+      const manifestKey = `${localPath}::${size}`;
+      const isCached = manifest[manifestKey]?.mtime === stat.mtimeMs;
+
+      process.stdout.write(isCached ? '·' : '↑');
+      sizes[size] = await uploadVariant(localPath, r2Key, maxPx, quality, manifestKey, manifest, stat);
+      isCached ? stats.skipped++ : stats.uploaded++;
     }
+
+    results.push(sizes as ImageSizes);
   }
-  return urls;
+  return results;
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -205,6 +235,7 @@ async function main() {
 
   const manifest = loadManifest();
   const stats = { works: 0, skipped: 0, images: { uploaded: 0, skipped: 0 } };
+  const seenSlugs = new Set<string>();
 
   // Glob all .md files in Prints & Drawings
   const files: string[] = [];
@@ -214,23 +245,25 @@ async function main() {
 
   console.log(`Found ${files.length} notes in Prints & Drawings`);
 
+  const total = files.length;
+  let workNum = 0;
+
   for (const filePath of files) {
+    workNum++;
     const raw = fs.readFileSync(filePath, 'utf-8');
     const { data } = matter(raw);
 
     // Skip deaccessioned works
     const deaccessioned = data['Deaccessioned'] ?? data['deaccessioned'];
     if (deaccessioned && typeof deaccessioned === 'string' && deaccessioned.trim().length > 0) {
+      console.log(`  [${workNum}/${total}] skip (deaccessioned) — ${path.basename(filePath)}`);
       stats.skipped++;
       continue;
     }
 
-    const notionId: string = data['notion-id'] ?? data['notionId'];
-    if (!notionId) {
-      console.warn(`  ⚠️  No notion-id in ${path.basename(filePath)}, skipping`);
-      stats.skipped++;
-      continue;
-    }
+    // Extract title early so we can generate the slug
+    const rawTitle = String(data['Title'] ?? path.basename(filePath, '.md'));
+    const title = (!rawTitle || rawTitle === 'undefined') ? path.basename(filePath, '.md') : rawTitle;
 
     // Resolve artist
     const artistWikilinks = toStringArray(data['Artist'] ?? data['artist']);
@@ -238,6 +271,9 @@ async function main() {
       ? extractWikilinkName(artistWikilinks[0])
       : 'Unknown';
     const { life: artistLife } = lookupArtist(artistName);
+
+    const slug = makeSlug(artistName, title, seenSlugs);
+    process.stdout.write(`  [${workNum}/${total}] ${slug} `);
 
     // Resolve "after" artists
     const afterWikilinks = toStringArray(data['After'] ?? data['after']);
@@ -280,16 +316,16 @@ async function main() {
       other: 'Image: Other',
     };
 
-    const images: Record<string, string[]> = {};
+    const images: Record<string, ImageSizes[]> = {};
     for (const [key, vaultField] of Object.entries(imageFieldMap)) {
       const wikilinks = toStringArray(data[vaultField] ?? data[vaultField.toLowerCase()]);
-      images[key] = await resolveImages(wikilinks, notionId, key, manifest, stats.images);
+      images[key] = await resolveImages(wikilinks, slug, key, manifest, stats.images);
     }
 
     // Build public work object
     const work = {
-      id: notionId,
-      title: String(data['Title'] ?? path.basename(filePath, '.md')),
+      id: slug,
+      title,
       titleAlt: data['Title Alt.'] ?? null,
       titleTrans: data['Title Trans.'] ?? null,
       artist: artistName,
@@ -312,13 +348,9 @@ async function main() {
       images,
     };
 
-    // Derive title from filename if not in frontmatter
-    if (!work.title || work.title === 'undefined') {
-      work.title = path.basename(filePath, '.md');
-    }
-
-    const outPath = path.join(CONTENT_DIR, `${notionId}.json`);
+    const outPath = path.join(CONTENT_DIR, `${slug}.json`);
     fs.writeFileSync(outPath, JSON.stringify(work, null, 2));
+    process.stdout.write('\n');
     stats.works++;
   }
 

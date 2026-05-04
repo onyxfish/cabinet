@@ -8,14 +8,20 @@ const dimensionsSchema = z.object({
   imageW: z.number().nullable().optional(),
 }).optional().nullable();
 
+const imageSizeSchema = z.object({
+  thumb: z.string(),
+  display: z.string(),
+  zoom: z.string(),
+});
+
 const imagesSchema = z.object({
-  display: z.array(z.string()).default([]),
-  recto: z.array(z.string()).default([]),
-  verso: z.array(z.string()).default([]),
-  plateSig: z.array(z.string()).default([]),
-  handSig: z.array(z.string()).default([]),
-  watermark: z.array(z.string()).default([]),
-  other: z.array(z.string()).default([]),
+  display: z.array(imageSizeSchema).default([]),
+  recto: z.array(imageSizeSchema).default([]),
+  verso: z.array(imageSizeSchema).default([]),
+  plateSig: z.array(imageSizeSchema).default([]),
+  handSig: z.array(imageSizeSchema).default([]),
+  watermark: z.array(imageSizeSchema).default([]),
+  other: z.array(imageSizeSchema).default([]),
 });
 
 const works = defineCollection({

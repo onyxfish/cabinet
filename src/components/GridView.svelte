@@ -9,7 +9,7 @@
     yearCreated: string;
     sortYear: number;
     dimensions?: { imageH?: number; imageW?: number } | null;
-    images: { display: string[] };
+    images: { display: { thumb: string; display: string; zoom: string }[] };
   }
 
   interface Props {
@@ -30,12 +30,6 @@
       : works.filter(w => w.medium.includes(activeFilter))
   );
 
-  function isPortrait(work: Work): boolean {
-    if (work.dimensions?.imageH && work.dimensions?.imageW) {
-      return work.dimensions.imageH > work.dimensions.imageW;
-    }
-    return work.id.charCodeAt(0) % 3 === 0;
-  }
 </script>
 
 <div>
@@ -55,7 +49,7 @@
 
   <div class="grid-masonry">
     {#each filtered as work (work.id)}
-      <GridCard {work} tall={isPortrait(work)} onSelect={() => window.location.href = `/works/${work.id}`} />
+      <GridCard {work} onSelect={() => window.location.href = `/works/${work.id}`} />
     {/each}
   </div>
 </div>

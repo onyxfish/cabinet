@@ -5,7 +5,7 @@
     id: string;
     title: string;
     artist: string;
-    images: { display: string[] };
+    images: { display: { thumb: string; display: string; zoom: string }[] };
   }
 
   interface Props {
@@ -38,7 +38,7 @@
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
         <a href="/works/{work.id}" class="thumb-link browse-thumb">
           <WorkImage
-            src={work.images.display[0]}
+            src={work.images.display[0]?.thumb}
             artist={work.artist}
             title={work.title}
             style="width: 120px; height: 120px; object-fit: cover; display: block;"
