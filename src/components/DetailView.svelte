@@ -283,13 +283,14 @@
         </AccordionSection>
       {/if}
 
-      <!-- Year acquired -->
+      <!-- Provenance -->
       {#if work.yearAcquired}
-        <div class="divider"></div>
-        <div class="meta-row">
-          <div class="meta-label">Acquired</div>
-          <div class="meta-value">{work.yearAcquired}</div>
-        </div>
+        <AccordionSection label="Provenance">
+          <div class="meta-row">
+            <div class="meta-label">Acquired</div>
+            <div class="meta-value">{work.yearAcquired}</div>
+          </div>
+        </AccordionSection>
       {/if}
     </div>
   </div>
