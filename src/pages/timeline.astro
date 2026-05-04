@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import TimelineView from '../components/TimelineView.svelte';
+import { getCollection } from 'astro:content';
+
+const allWorks = await getCollection('works');
+const works = allWorks.map(e => e.data);
+---
+
+<Base title="Timeline" description="Browse the collection chronologically by decade.">
+  <Header currentPage="timeline" />
+  <main>
+    <TimelineView {works} client:load />
+  </main>
+</Base>

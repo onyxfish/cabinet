@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../../components/Header.astro';
+import DetailView from '../../components/DetailView.svelte';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const works = await getCollection('works');
+  return works.map(entry => ({
+    params: { id: entry.id },
+    props: { work: entry.data },
+  }));
+}
+
+const { work } = Astro.props;
+const displayTitle = work.title.replace(/^[""]|[""]$/g, '');
+const description = [work.artist, work.medium.join(', '), work.yearCreated].filter(Boolean).join(' · ');
+---
+
+<Base title={displayTitle} description={description}>
+  <Header />
+  <main>
+    <DetailView {work} client:load />
+  </main>
+</Base>

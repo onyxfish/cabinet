@@ -1,0 +1,132 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:         #f4efe8;
+  --bg2:        #ece6dd;
+  --bg3:        #e2dbd0;
+  --border:     #d0c8bc;
+  --border-lt:  #e4ddd4;
+  --text:       #1c1814;
+  --text-dim:   #6b6158;
+  --text-faint: #a89e94;
+  --accent:     #8b6b3d;
+  --accent-lt:  #c8a96e;
+  --accent-bg:  #f0e8d8;
+  --serif:      'Cormorant Garamond', Georgia, serif;
+  --sans:       'DM Sans', system-ui, sans-serif;
+  --header-h:   56px;
+}
+
+html, body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--sans);
+}
+
+::selection {
+  background: var(--accent-lt);
+  color: var(--bg);
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Image placeholder */
+.img-ph {
+  background: var(--bg3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.img-ph::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.025) 10px,
+    rgba(0, 0, 0, 0.025) 11px
+  );
+}
+
+.img-ph-inner {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 16px;
+}
+
+.img-ph-artist {
+  display: block;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+}
+
+.img-ph-title {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  :root { --header-h: 52px; }
+
+  .detail-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .detail-meta-col {
+    border-left: none !important;
+    border-top: 1px solid var(--border);
+  }
+
+  .browse-thumb {
+    width: 90px !important;
+    height: 90px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-masonry {
+    columns: 2 !important;
+  }
+
+  .filter-bar {
+    padding: 12px 14px !important;
+  }
+}

@@ -1,0 +1,107 @@
+---
+interface Props {
+  currentPage?: 'collection' | 'timeline' | 'browse';
+}
+const { currentPage } = Astro.props;
+---
+
+<header>
+  <a href="/" class="site-name">Cabinet</a>
+
+  <nav>
+    <a href="/" class:list={['nav-link', { active: currentPage === 'collection' }]}>Collection</a>
+    <a href="/timeline" class:list={['nav-link', { active: currentPage === 'timeline' }]}>Timeline</a>
+    <a href="/browse" class:list={['nav-link', { active: currentPage === 'browse' }]}>Browse</a>
+  </nav>
+
+  <div class="search-wrap">
+    <div id="pagefind-search"></div>
+  </div>
+</header>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const { PagefindUI } = await import('/pagefind/pagefind-ui.js');
+      new PagefindUI({
+        element: '#pagefind-search',
+        showSubResults: false,
+        showImages: false,
+        resetStyles: true,
+        translations: { placeholder: 'Search works, artists…' },
+      });
+    } catch {
+      // Pagefind not available (dev mode before first build)
+    }
+  });
+</script>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--header-h);
+    background: rgba(244, 239, 232, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .site-name {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .nav-link {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 4px 12px;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    text-decoration: none;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--text);
+  }
+
+  .nav-link.active {
+    border-bottom-color: var(--accent);
+  }
+
+  .search-wrap {
+    min-width: 200px;
+  }
+
+  /* Pagefind UI overrides — scoped to header */
+  :global(#pagefind-search .pagefind-ui) {
+    --pagefind-ui-font: var(--sans);
+    --pagefind-ui-primary: var(--accent);
+    --pagefind-ui-text: var(--text);
+    --pagefind-ui-background: var(--bg2);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 2px;
+    --pagefind-ui-scale: 0.85;
+  }
+</style>
