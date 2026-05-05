@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import AccordionSection from './AccordionSection.svelte';
+  import TimelineCard from './TimelineCard.svelte';
 
   interface Dimensions {
     imageH?: number | null;
@@ -41,11 +42,20 @@
     };
   }
 
-  interface Props {
-    work: Work;
+  interface RelatedWork {
+    id: string;
+    title: string;
+    artist: string;
+    yearCreated: string;
+    images: { display: { thumb: string; display: string; zoom: string }[] };
   }
 
-  let { work }: Props = $props();
+  interface Props {
+    work: Work;
+    relatedWorks?: RelatedWork[];
+  }
+
+  let { work, relatedWorks = [] }: Props = $props();
 
   // Build available image views
   type ImageSize = { thumb: string; display: string; zoom: string };
@@ -294,6 +304,20 @@
     </div>
   </div>
 </div>
+
+<!-- Other works by this artist -->
+{#if relatedWorks.length > 0}
+  <div class="related-section">
+    <div class="related-header">Other works by {work.artist}</div>
+    <div class="related-strip">
+      {#each relatedWorks as r (r.id)}
+        <div class="related-tile">
+          <TimelineCard work={r} onSelect={() => window.location.href = `/works/${r.id}`} />
+        </div>
+      {/each}
+    </div>
+  </div>
+{/if}
 
 <!-- Lightbox -->
 {#if lightboxOpen}
@@ -553,10 +577,38 @@
 
   .lightbox-close:hover { color: white; }
 
+  /* Related works */
+  .related-section {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px 40px;
+  }
+
+  .related-header {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 20px;
+  }
+
+  .related-strip {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+  }
+
+  .related-tile {
+    width: 200px;
+    flex-shrink: 0;
+  }
+
   /* Mobile */
   @media (max-width: 768px) {
     .detail-grid { grid-template-columns: 1fr; }
     .image-col { padding: 24px 20px; border-right: none; border-bottom: 1px solid var(--border); }
     .detail-meta-col { padding: 24px 20px; }
+    .related-section { padding: 24px 20px 32px; }
+    .related-tile { width: 160px; }
   }
 </style>

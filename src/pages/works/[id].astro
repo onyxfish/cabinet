@@ -13,6 +13,20 @@ export async function getStaticPaths() {
 }
 
 const { work } = Astro.props;
+
+// Compute related works at page render time (available at build + dev)
+const allWorks = await getCollection('works');
+const relatedWorks = allWorks
+  .filter(e => e.data.artist === work.artist && e.id !== Astro.params.id)
+  .map(e => ({
+    id: e.id,
+    title: e.data.title,
+    artist: e.data.artist,
+    yearCreated: e.data.yearCreated,
+    sortYear: e.data.sortYear,
+    images: { display: e.data.images.display.slice(0, 1) },
+  }))
+  .sort((a, b) => (a.sortYear || Infinity) - (b.sortYear || Infinity));
 const displayTitle = work.title.replace(/^[""]|[""]$/g, '');
 const description = [work.artist, work.medium.join(', '), work.yearCreated].filter(Boolean).join(' · ');
 ---
@@ -20,6 +34,6 @@ const description = [work.artist, work.medium.join(', '), work.yearCreated].filt
 <Base title={displayTitle} description={description}>
   <Header />
   <main>
-    <DetailView {work} client:load />
+    <DetailView {work} {relatedWorks} client:load />
   </main>
 </Base>
