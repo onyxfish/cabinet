@@ -7,7 +7,12 @@ import { getCollection } from 'astro:content';
 const allWorks = await getCollection('works');
 const works = allWorks
   .map(e => e.data)
-  .sort((a, b) => a.sortYear - b.sortYear);
+  .sort((a, b) => {
+    const ay = a.sortYear || Infinity;
+    const by = b.sortYear || Infinity;
+    if (ay !== by) return ay - by;
+    return a.artist.localeCompare(b.artist) || a.title.localeCompare(b.title);
+  });
 ---
 
 <Base title="Cabinet" description="A personal collection of prints and drawings.">

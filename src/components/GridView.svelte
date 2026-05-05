@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import GridCard from './GridCard.svelte';
 
   interface Work {
@@ -42,6 +43,25 @@
     });
   })());
 
+  // Responsive column count — mirrors CSS breakpoints
+  let columnCount = $state(4);
+
+  onMount(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      columnCount = w <= 768 ? 2 : w <= 1200 ? 3 : 4;
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  });
+
+  // Distribute works left-to-right (round-robin) so reading order matches sort order
+  const columns: Work[][] = $derived((() => {
+    const cols: Work[][] = Array.from({ length: columnCount }, () => []);
+    filtered.forEach((work, i) => cols[i % columnCount].push(work));
+    return cols;
+  })());
 </script>
 
 <div>
@@ -66,8 +86,12 @@
   </div>
 
   <div class="grid-masonry">
-    {#each filtered as work (work.id)}
-      <GridCard {work} onSelect={() => window.location.href = `/works/${work.id}`} />
+    {#each columns as col}
+      <div class="grid-col">
+        {#each col as work (work.id)}
+          <GridCard {work} onSelect={() => window.location.href = `/works/${work.id}`} />
+        {/each}
+      </div>
     {/each}
   </div>
 </div>
@@ -149,14 +173,19 @@
 
   .grid-masonry {
     padding: 3px;
-    columns: 4;
-    column-gap: 3px;
+    display: flex;
+    gap: 3px;
+    align-items: flex-start;
   }
 
-  @media (max-width: 1200px) { .grid-masonry { columns: 3; } }
-  @media (max-width: 768px)  { .grid-masonry { columns: 2; } }
-  @media (max-width: 480px)  {
-    .grid-masonry { columns: 2; }
+  .grid-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  @media (max-width: 480px) {
     .filter-bar { padding: 12px 14px; }
   }
 </style>

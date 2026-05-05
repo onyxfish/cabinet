@@ -37,19 +37,19 @@
       style="transform: {hovered ? 'scale(1.02)' : 'scale(1)'}; transition: transform 0.5s cubic-bezier(0.25,0,0,1);"
       loading="lazy"
     />
-    <div class="year-badge" style="opacity: {hovered ? 0 : 0.7}">{work.yearCreated}</div>
+
   {:else}
     <div class="card-stripe"></div>
     <div class="ph-label">
       <div class="ph-title" style="color: {hovered ? '#f0ebe3' : 'var(--text-dim)'}">{displayTitle}</div>
-      <div class="ph-meta" style="color: {hovered ? 'rgba(240,235,227,0.7)' : 'var(--text-faint)'}">{work.artist}</div>
+      <div class="ph-meta" style="color: {hovered ? 'rgba(240,235,227,0.7)' : 'var(--text-faint)'}"><span class="uc">{work.artist}</span>{work.yearCreated ? ` · ${work.yearCreated}` : ''}</div>
     </div>
   {/if}
 
   {#if hasImage}
     <div class="overlay" style="opacity: {hovered ? 1 : 0}">
       <div class="overlay-title">{displayTitle}</div>
-      <div class="overlay-meta">{work.artist}{work.yearCreated ? ` · ${work.yearCreated}` : ''}</div>
+      <div class="overlay-meta"><span class="uc">{work.artist}</span>{work.yearCreated ? ` · ${work.yearCreated}` : ''}</div>
     </div>
   {:else}
     <div class="overlay overlay-ph" style="opacity: {hovered ? 1 : 0}"></div>
@@ -68,7 +68,7 @@
   }
 
   .card.is-placeholder {
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 4 / 3;
   }
 
   .card-img {
@@ -121,7 +121,6 @@
     font-size: 12px;
     color: rgba(240, 235, 227, 0.7);
     letter-spacing: 0.06em;
-    text-transform: uppercase;
   }
 
   .ph-label {
@@ -146,8 +145,11 @@
     font-family: var(--sans);
     font-size: 12px;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
     transition: color 0.3s;
+  }
+
+  .uc {
+    text-transform: uppercase;
   }
 
   .overlay-ph {
