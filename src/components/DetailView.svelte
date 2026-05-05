@@ -219,11 +219,10 @@
       <div class="meta-stack">
         <div class="meta-row">
           <div class="meta-label">Date</div>
-          <div class="meta-value">
-            {work.yearCreated}{#if work.yearPrinted && work.yearPrinted !== work.yearCreated && work.yearPrinted !== 'N/A'}
-              <span class="meta-sub"> · printed {work.yearPrinted}</span>
-            {/if}
-          </div>
+          <div class="meta-value">{work.yearCreated}</div>
+          {#if work.yearPrinted && work.yearPrinted !== work.yearCreated && work.yearPrinted !== 'N/A'}
+            <div class="artist-life">Printed {work.yearPrinted}</div>
+          {/if}
         </div>
 
         {#if work.medium.length > 0}
