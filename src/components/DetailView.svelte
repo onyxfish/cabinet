@@ -118,16 +118,6 @@
 </script>
 
 <div>
-  <!-- Back bar -->
-  <div class="back-bar">
-    <a href="/" class="back-btn">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <line x1="13" y1="8" x2="3" y2="8" /><polyline points="7,4 3,8 7,12" />
-      </svg>
-      Collection
-    </a>
-  </div>
-
   <!-- Two-column layout -->
   <div class="detail-grid">
     <!-- Left: Image -->
@@ -329,30 +319,10 @@
 {/if}
 
 <style>
-  .back-bar {
-    padding: 14px 24px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--sans);
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-
-  .back-btn:hover { color: var(--text); }
 
   .detail-grid {
     display: grid;
     grid-template-columns: 1fr 380px;
-    min-height: calc(100vh - 112px);
   }
 
   /* Image column */

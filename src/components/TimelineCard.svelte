@@ -36,9 +36,8 @@
   />
   <div class="overlay">
     <div class="title">{displayTitle}</div>
-    <div class="artist">{work.artist}</div>
+    <div class="artist"><span class="uc">{work.artist}</span>{#if work.yearCreated} · <span class="nowrap">{work.yearCreated}</span>{/if}</div>
   </div>
-  <div class="year">{work.yearCreated}</div>
 </div>
 
 <style>
@@ -79,18 +78,13 @@
     font-size: 11px;
     color: rgba(240, 235, 227, 0.65);
     letter-spacing: 0.07em;
+  }
+
+  .uc {
     text-transform: uppercase;
   }
 
-  .year {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    font-family: var(--sans);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    background: rgba(244, 239, 232, 0.88);
-    color: var(--text-dim);
-    padding: 2px 7px;
+  .nowrap {
+    white-space: nowrap;
   }
 </style>

@@ -42,14 +42,14 @@
     <div class="card-stripe"></div>
     <div class="ph-label">
       <div class="ph-title" style="color: {hovered ? '#f0ebe3' : 'var(--text-dim)'}">{displayTitle}</div>
-      <div class="ph-meta" style="color: {hovered ? 'rgba(240,235,227,0.7)' : 'var(--text-faint)'}"><span class="uc">{work.artist}</span>{work.yearCreated ? ` · ${work.yearCreated}` : ''}</div>
+      <div class="ph-meta" style="color: {hovered ? 'rgba(240,235,227,0.7)' : 'var(--text-faint)'}"><span class="uc">{work.artist}</span>{#if work.yearCreated} · <span class="nowrap">{work.yearCreated}</span>{/if}</div>
     </div>
   {/if}
 
   {#if hasImage}
     <div class="overlay" style="opacity: {hovered ? 1 : 0}">
       <div class="overlay-title">{displayTitle}</div>
-      <div class="overlay-meta"><span class="uc">{work.artist}</span>{work.yearCreated ? ` · ${work.yearCreated}` : ''}</div>
+      <div class="overlay-meta"><span class="uc">{work.artist}</span>{#if work.yearCreated} · <span class="nowrap">{work.yearCreated}</span>{/if}</div>
     </div>
   {:else}
     <div class="overlay overlay-ph" style="opacity: {hovered ? 1 : 0}"></div>
@@ -150,6 +150,10 @@
 
   .uc {
     text-transform: uppercase;
+  }
+
+  .nowrap {
+    white-space: nowrap;
   }
 
   .overlay-ph {
