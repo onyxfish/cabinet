@@ -8,6 +8,7 @@
   "scripts": {
     "sync": "tsx scripts/sync.ts",
     "enrich:lookup": "tsx scripts/enrich-lookup.ts",
+    "enrich:requery": "tsx scripts/enrich-requery.ts",
     "enrich:apply": "tsx scripts/enrich-apply.ts",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
