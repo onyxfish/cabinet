@@ -30,7 +30,7 @@
     "pagefind": "^1.5.2",
     "sharp": "^0.34.5",
     "tsx": "^4.21.0",
-    "wrangler": "^4.87.0"
+    "wrangler": "^4.88.0"
   },
   "overrides": {
     "vite": "^7"
