@@ -1,55 +1,84 @@
 ---
-import Base from '../layouts/Base.astro';
-import Header from '../components/Header.astro';
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
 ---
 
 <Base title="About" description="About the Cabinet collection.">
-  <Header currentPage="about" />
-  <main class="about-page">
-    <div class="about-content">
-      <h1>Cabinet</h1>
-      <p>
-        A personal collection of prints and drawings assembled over many years,
-        spanning the sixteenth through twentieth centuries. The works are primarily
-        European, with a concentration in French and Dutch printmaking of the
-        seventeenth and eighteenth centuries.
-      </p>
-      <p>
-        The collection is organized around recurring interests: landscape and
-        topography, the figure in motion, ornament and design, and the technical
-        achievements of the great printmaking traditions — etching, engraving,
-        mezzotint, and aquatint.
-      </p>
-      <p>
-        Works are catalogued with artist, date, medium, dimensions, and — where
-        applicable — references to standard catalogue raisonnés.
-      </p>
-    </div>
-  </main>
+    <Header currentPage="about" />
+    <main class="about-page">
+        <div class="about-content">
+            <h1>Cabinet</h1>
+            <p>
+                This site presents a personal collection of prints and drawings
+                assembled by <a href="https://chrisgroskopf.com"
+                    >Chris Groskopf</a
+                > beginning in 2016. The collection includes European and American
+                works spanning the sixteenth through twentieth centuries, with an
+                emphasis on etching.
+            </p>
+            <p>
+                This collection is primarily <em>opportunistic</em>. While parts
+                of it reflect my interest in particular artists, such as <a
+                    href="https://colmanetchings.com">Samuel Colman</a
+                >, the majority is comprised of works I was lucky to find at an
+                affordable price.
+            </p>
+            <p>
+                Despite their modest origins, some of these works are quite
+                rare, including a few of which I haven't been able to locate any
+                other copies. I am publishing my collection to make these works
+                accessible to researchers, collectors, and anyone else who may
+                be interested in them.
+            </p>
+            <p>
+                For inquiries, please email <a
+                    href="mailto:chrisgroskopf@gmail.com"
+                    >chrisgroskopf@gmail.com</a
+                >. While I am not an art dealer, I will entertain thoughtful
+                buy/sell/trade offers.
+            </p>
+            <p>
+                All content on this site is licensed under the <a
+                    href="https://creativecommons.org/licenses/by-nc/4.0/"
+                    >Creative Commons BY-NC 4.0 license</a
+                >.
+            </p>
+        </div>
+    </main>
 </Base>
 
 <style>
-  .about-page {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 64px 32px;
-  }
+    .about-page {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 64px 32px;
+    }
 
-  h1 {
-    font-family: var(--serif);
-    font-size: 40px;
-    font-weight: 300;
-    letter-spacing: -0.01em;
-    color: var(--accent);
-    margin: 0 0 40px;
-  }
+    h1 {
+        font-family: var(--serif);
+        font-size: 40px;
+        font-weight: 300;
+        letter-spacing: -0.01em;
+        color: var(--accent);
+        margin: 0 0 20px;
+    }
 
-  p {
-    font-family: var(--serif);
-    font-size: 20px;
-    font-weight: 300;
-    line-height: 1.7;
-    color: var(--text);
-    margin: 0 0 24px;
-  }
+    p {
+        font-family: var(--serif);
+        font-size: 20px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: var(--text);
+        margin: 0 0 24px;
+    }
+
+    a {
+        color: var(--accent);
+    }
+
+    a:hover {
+        color: var(--accent-lt);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
 </style>

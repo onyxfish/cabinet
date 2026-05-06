@@ -1,35 +1,78 @@
 ---
 interface Props {
-  title?: string;
-  description?: string;
+    title?: string;
+    description?: string;
 }
-const { title = 'Cabinet', description = 'A personal collection of prints and drawings.' } = Astro.props;
-const pageTitle = title === 'Cabinet' ? 'Cabinet — Prints & Drawings' : `${title} · Cabinet`;
+const {
+    title = "Cabinet",
+    description = "A personal collection of prints and drawings.",
+} = Astro.props;
+const pageTitle =
+    title === "Cabinet" ? "Cabinet — Prints & Drawings" : `${title} · Cabinet`;
 ---
 
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{pageTitle}</title>
-  <meta name="description" content={description} />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{pageTitle}</title>
+        <meta name="description" content={description} />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
-    rel="stylesheet"
-  />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+            rel="stylesheet"
+        />
 
-  <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-</head>
-<body>
-  <slot />
-</body>
+        <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    </head>
+    <body>
+        <slot />
+        <footer>
+            <p>
+                Made by <a href="https://chrisgroskopf.com"
+                    >Christopher Groskopf</a
+                > in Oakland, CA.
+            </p>
+            <p>
+                Website, words, and photos are <a
+                    href="https://creativecommons.org/licenses/by-nc/4.0/"
+                    >CC-BY-NC-4.0</a
+                >.
+            </p>
+        </footer>
+    </body>
 </html>
 
 <style is:global>
-  @import '../styles/global.css';
+    @import "../styles/global.css";
+
+    footer {
+        padding: 32px 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        text-align: center;
+    }
+
+    footer p {
+        font-family: var(--sans);
+        font-size: 12px;
+        color: var(--text-faint);
+        line-height: 1.5;
+    }
+
+    footer a {
+        color: var(--text-faint);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    footer a:hover {
+        color: var(--text-dim);
+    }
 </style>

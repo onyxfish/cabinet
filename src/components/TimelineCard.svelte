@@ -32,7 +32,7 @@
     artist={work.artist}
     title={work.title}
     label={false}
-    style="width: 100%; height: 200px; object-fit: contain; background: var(--bg3); display: block; transform: {hovered ? 'scale(1.03)' : 'scale(1)'}; transition: transform 0.4s cubic-bezier(0.25,0,0,1);"
+    style="width: 100%; height: 280px; object-fit: contain; background: var(--bg3); display: block; transform: {hovered ? 'scale(1.03)' : 'scale(1)'}; transition: transform 0.4s cubic-bezier(0.25,0,0,1);"
   />
   <div class="overlay">
     <div class="title">{displayTitle}</div>
@@ -65,7 +65,7 @@
 
   .title {
     font-family: var(--serif);
-    font-size: 15px;
+    font-size: 17px;
     font-style: italic;
     color: #f0ebe3;
     line-height: 1.25;
@@ -75,7 +75,7 @@
 
   .artist {
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 12px;
     color: rgba(240, 235, 227, 0.65);
     letter-spacing: 0.07em;
   }

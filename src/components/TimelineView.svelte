@@ -131,12 +131,13 @@
     position: sticky;
     top: var(--header-h);
     align-self: flex-start;
-    width: 80px;
+    width: 96px;
     flex-shrink: 0;
     padding: 32px 0 32px 20px;
     border-right: 1px solid var(--border);
     max-height: calc(100vh - var(--header-h));
     overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .jump-btn {
@@ -146,7 +147,6 @@
     font-family: var(--sans);
     font-size: 12px;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     padding: 5px 0;
     background: none;
     border: none;
@@ -214,7 +214,7 @@
 
   .decade-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 3px;
   }
 
