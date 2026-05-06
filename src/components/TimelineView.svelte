@@ -172,7 +172,7 @@
   }
 
   .decade-section {
-    margin-bottom: 64px;
+    margin-bottom: 32px;
   }
 
   .decade-header {
