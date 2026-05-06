@@ -113,6 +113,7 @@
     let activeViewKey = $state(imageViews[0]?.key ?? "display");
     let activeImageIndex = $state(0);
     let lightboxOpen = $state(false);
+    let touchStartX = $state(0);
 
     const activeView: ImageView | undefined = $derived(
         imageViews.find((v) => v.key === activeViewKey) ?? imageViews[0],
@@ -121,15 +122,62 @@
         activeView?.images[activeImageIndex],
     );
     const hasImages: boolean = $derived(imageViews.length > 0);
+    const canNavigate: boolean = $derived(
+        imageViews.length > 1 ||
+            (activeView?.images.length ?? 0) > 1,
+    );
+    const hasPrev: boolean = $derived(
+        (() => {
+            if (!activeView) return false;
+            if (activeImageIndex > 0) return true;
+            return imageViews.findIndex((v) => v.key === activeViewKey) > 0;
+        })(),
+    );
+    const hasNext: boolean = $derived(
+        (() => {
+            if (!activeView) return false;
+            if (activeImageIndex < activeView.images.length - 1) return true;
+            const idx = imageViews.findIndex((v) => v.key === activeViewKey);
+            return idx < imageViews.length - 1;
+        })(),
+    );
 
     function setView(key: string) {
         activeViewKey = key;
         activeImageIndex = 0;
     }
 
+    function navigate(dir: -1 | 1) {
+        if (!activeView) return;
+        const newIndex = activeImageIndex + dir;
+        if (newIndex >= 0 && newIndex < activeView.images.length) {
+            activeImageIndex = newIndex;
+        } else {
+            const viewIdx = imageViews.findIndex(
+                (v) => v.key === activeViewKey,
+            );
+            const newViewIdx = viewIdx + dir;
+            if (newViewIdx >= 0 && newViewIdx < imageViews.length) {
+                activeViewKey = imageViews[newViewIdx].key;
+                activeImageIndex =
+                    dir === 1
+                        ? 0
+                        : imageViews[newViewIdx].images.length - 1;
+            }
+        }
+    }
+
     onMount(() => {
         const handleKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape" && lightboxOpen) lightboxOpen = false;
+            if (e.key === "Escape" && lightboxOpen) {
+                lightboxOpen = false;
+            } else if (e.key === "ArrowLeft" && hasImages) {
+                e.preventDefault();
+                navigate(-1);
+            } else if (e.key === "ArrowRight" && hasImages) {
+                e.preventDefault();
+                navigate(1);
+            }
         };
         window.addEventListener("keydown", handleKey);
         return () => window.removeEventListener("keydown", handleKey);
@@ -170,6 +218,14 @@
                     onclick={() => {
                         if (activeImage) lightboxOpen = true;
                     }}
+                    ontouchstart={(e) => {
+                        touchStartX = e.touches[0].clientX;
+                    }}
+                    ontouchend={(e) => {
+                        const dx =
+                            e.changedTouches[0].clientX - touchStartX;
+                        if (Math.abs(dx) > 50) navigate(dx > 0 ? -1 : 1);
+                    }}
                     style="cursor: {activeImage ? 'zoom-in' : 'default'}"
                 >
                     {#if activeImage}
@@ -186,6 +242,28 @@
                                 <span class="img-ph-title">{displayTitle}</span>
                             </div>
                         </div>
+                    {/if}
+                    {#if canNavigate}
+                        {#if hasPrev}
+                            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+                            <div
+                                class="nav-arrow nav-prev"
+                                onclick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(-1);
+                                }}
+                            >&#8249;</div>
+                        {/if}
+                        {#if hasNext}
+                            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+                            <div
+                                class="nav-arrow nav-next"
+                                onclick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(1);
+                                }}
+                            >&#8250;</div>
+                        {/if}
                     {/if}
                 </div>
 
@@ -383,7 +461,17 @@
 <!-- Lightbox -->
 {#if lightboxOpen}
     <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
-    <div class="lightbox" onclick={() => (lightboxOpen = false)}>
+    <div
+        class="lightbox"
+        onclick={() => (lightboxOpen = false)}
+        ontouchstart={(e) => {
+            touchStartX = e.touches[0].clientX;
+        }}
+        ontouchend={(e) => {
+            const dx = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(dx) > 50) navigate(dx > 0 ? -1 : 1);
+        }}
+    >
         <img src={activeImage?.zoom} alt={displayTitle} class="lightbox-img" />
         <button
             class="lightbox-close"
@@ -392,6 +480,26 @@
                 lightboxOpen = false;
             }}>Close</button
         >
+        {#if hasPrev}
+            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+            <div
+                class="lb-arrow lb-prev"
+                onclick={(e) => {
+                    e.stopPropagation();
+                    navigate(-1);
+                }}
+            >&#8249;</div>
+        {/if}
+        {#if hasNext}
+            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+            <div
+                class="lb-arrow lb-next"
+                onclick={(e) => {
+                    e.stopPropagation();
+                    navigate(1);
+                }}
+            >&#8250;</div>
+        {/if}
     </div>
 {/if}
 
@@ -443,6 +551,54 @@
         background: rgba(244, 239, 232, 0.85);
         padding: 3px 8px;
     }
+
+    .nav-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 36px;
+        line-height: 1;
+        color: var(--text-dim);
+        background: rgba(244, 239, 232, 0.75);
+        padding: 4px 10px 6px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.15s;
+        user-select: none;
+    }
+
+    .main-image-wrap:hover .nav-arrow {
+        opacity: 1;
+    }
+
+    .nav-prev { left: 0; }
+    .nav-next { right: 0; }
+
+    .nav-arrow:hover {
+        color: var(--text);
+        background: rgba(244, 239, 232, 0.95);
+    }
+
+    /* Lightbox arrows */
+    .lb-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 56px;
+        line-height: 1;
+        color: rgba(255, 255, 255, 0.4);
+        padding: 8px 20px;
+        cursor: pointer;
+        user-select: none;
+        transition: color 0.15s;
+    }
+
+    .lb-arrow:hover {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .lb-prev { left: 16px; }
+    .lb-next { right: 16px; }
 
     .multi-thumbs {
         display: flex;

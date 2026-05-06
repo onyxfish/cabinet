@@ -34,3 +34,5 @@ src/content/works/
 
 # pipeline cache
 scripts/.image-manifest.json
+
+.claude/worktrees
