@@ -160,14 +160,4 @@
     pointer-events: none;
   }
 
-  .year-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-family: var(--sans);
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    color: var(--text-faint);
-    transition: opacity 0.2s;
-  }
 </style>

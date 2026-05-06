@@ -51,6 +51,9 @@ const jsonLd = {
         ...(work.artistNationality
             ? { nationality: work.artistNationality }
             : {}),
+        ...(work.artistWikidataId
+            ? { sameAs: `https://www.wikidata.org/wiki/${work.artistWikidataId}` }
+            : {}),
     },
     dateCreated: work.yearCreated,
     ...(work.yearPrinted ? { datePublished: work.yearPrinted } : {}),

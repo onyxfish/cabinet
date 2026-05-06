@@ -7,13 +7,14 @@
   },
   "scripts": {
     "sync": "tsx scripts/sync.ts",
+    "enrich:lookup": "tsx scripts/enrich-lookup.ts",
+    "enrich:apply": "tsx scripts/enrich-apply.ts",
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
     "preview": "astro build && wrangler pages dev",
     "deploy": "pnpm build && wrangler pages deploy",
     "astro": "astro",
-    "generate-types": "wrangler types",
-    "cf-typegen": "wrangler types"
+    "generate-types": "wrangler types"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.3.0",

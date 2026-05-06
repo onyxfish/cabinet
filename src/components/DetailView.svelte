@@ -18,6 +18,8 @@
         artist: string;
         artistLife?: string | null;
         artistNationality?: string | null;
+        artistWikidataId?: string | null;
+        artistUlanId?: string | null;
         after: string[];
         medium: string[];
         support?: string | null;
@@ -328,6 +330,26 @@
                 {/if}
                 {#if work.artistLife}
                     <div class="artist-life">{work.artistLife}</div>
+                {/if}
+                {#if work.artistWikidataId || work.artistUlanId}
+                    <div class="artist-refs">
+                        {#if work.artistWikidataId}
+                            <a
+                                class="ref-link"
+                                href="https://www.wikidata.org/wiki/{work.artistWikidataId}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >Wikidata</a>
+                        {/if}
+                        {#if work.artistUlanId}
+                            <a
+                                class="ref-link"
+                                href="https://vocab.getty.edu/ulan/{work.artistUlanId}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >ULAN</a>
+                        {/if}
+                    </div>
                 {/if}
             </div>
 
@@ -714,12 +736,26 @@
         color: var(--text-dim);
     }
 
-    .after-line {
-        font-family: var(--sans);
-        font-size: 14px;
-        color: var(--text-dim);
-        font-style: italic;
+    .artist-refs {
+        display: flex;
+        gap: 10px;
         margin-top: 2px;
+    }
+
+    .ref-link {
+        font-family: var(--sans);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        text-decoration: none;
+        border-bottom: 1px solid var(--border);
+        transition: color 0.12s, border-color 0.12s;
+    }
+
+    .ref-link:hover {
+        color: var(--text-dim);
+        border-color: var(--text-dim);
     }
 
     .divider {

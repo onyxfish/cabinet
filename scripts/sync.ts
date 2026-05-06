@@ -120,14 +120,15 @@ function toStringArray(val: unknown): string[] {
 
 // ─── Artist Lookup ───────────────────────────────────────────────────────────
 
-const artistCache: Record<string, { life: string | null; nationality: string | null }> = {};
+type ArtistInfo = { life: string | null; nationality: string | null; wikidataId: string | null; ulanId: string | null };
+const artistCache: Record<string, ArtistInfo> = {};
 
-function lookupArtist(name: string): { life: string | null; nationality: string | null } {
+function lookupArtist(name: string): ArtistInfo {
   if (artistCache[name]) return artistCache[name];
 
   const filePath = path.join(ARTISTS_DIR, `${name}.md`);
   if (!fs.existsSync(filePath)) {
-    artistCache[name] = { life: null, nationality: null };
+    artistCache[name] = { life: null, nationality: null, wikidataId: null, ulanId: null };
     return artistCache[name];
   }
 
@@ -140,7 +141,9 @@ function lookupArtist(name: string): { life: string | null; nationality: string 
   }
   const natArr = toStringArray(data['Nationality'] ?? data['nationality']);
   const nationality = natArr.length > 0 ? natArr[0] : null;
-  artistCache[name] = { life, nationality };
+  const wikidataId = data['Wikidata'] ? String(data['Wikidata']) : null;
+  const ulanId = data['ULAN'] ? String(data['ULAN']) : null;
+  artistCache[name] = { life, nationality, wikidataId, ulanId };
   return artistCache[name];
 }
 
@@ -272,7 +275,7 @@ async function main() {
     const artistName = artistWikilinks.length > 0
       ? extractWikilinkName(artistWikilinks[0])
       : 'Unknown';
-    const { life: artistLife, nationality: artistNationality } = lookupArtist(artistName);
+    const { life: artistLife, nationality: artistNationality, wikidataId: artistWikidataId, ulanId: artistUlanId } = lookupArtist(artistName);
 
     const slug = makeSlug(artistName, title, seenSlugs);
     process.stdout.write(`  [${workNum}/${total}] ${slug} `);
@@ -334,6 +337,8 @@ async function main() {
       artist: artistName,
       artistLife: artistLife ?? null,
       artistNationality: artistNationality ?? null,
+      artistWikidataId: artistWikidataId ?? null,
+      artistUlanId: artistUlanId ?? null,
       after,
       medium,
       support: data['Support'] ?? null,
