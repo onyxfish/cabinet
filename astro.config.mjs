@@ -1,8 +1,10 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import svelte from '@astrojs/svelte';
+import { defineConfig } from "astro/config";
+import svelte from "@astrojs/svelte";
+import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
-  output: 'static',
-  integrations: [svelte()],
+  site: "https://cabinet.chrisgroskopf.com",
+  output: "static",
+  integrations: [svelte(), sitemap()],
 });

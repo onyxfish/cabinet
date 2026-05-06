@@ -1,39 +1,76 @@
 ---
-import Base from '../../layouts/Base.astro';
-import Header from '../../components/Header.astro';
-import DetailView from '../../components/DetailView.svelte';
-import { getCollection } from 'astro:content';
+import Base from "../../layouts/Base.astro";
+import Header from "../../components/Header.astro";
+import DetailView from "../../components/DetailView.svelte";
+import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
-  const works = await getCollection('works');
-  return works.map(entry => ({
-    params: { id: entry.id },
-    props: { work: entry.data },
-  }));
+    const works = await getCollection("works");
+    return works.map((entry) => ({
+        params: { id: entry.id },
+        props: { work: entry.data },
+    }));
 }
 
 const { work } = Astro.props;
 
 // Compute related works at page render time (available at build + dev)
-const allWorks = await getCollection('works');
+const allWorks = await getCollection("works");
 const relatedWorks = allWorks
-  .filter(e => e.data.artist === work.artist && e.id !== Astro.params.id)
-  .map(e => ({
-    id: e.id,
-    title: e.data.title,
-    artist: e.data.artist,
-    yearCreated: e.data.yearCreated,
-    sortYear: e.data.sortYear,
-    images: { display: e.data.images.display.slice(0, 1) },
-  }))
-  .sort((a, b) => (a.sortYear || Infinity) - (b.sortYear || Infinity));
-const displayTitle = work.title.replace(/^[""]|[""]$/g, '');
-const description = [work.artist, work.medium.join(', '), work.yearCreated].filter(Boolean).join(' · ');
+    .filter((e) => e.data.artist === work.artist && e.id !== Astro.params.id)
+    .map((e) => ({
+        id: e.id,
+        title: e.data.title,
+        artist: e.data.artist,
+        yearCreated: e.data.yearCreated,
+        sortYear: e.data.sortYear,
+        images: { display: e.data.images.display.slice(0, 1) },
+    }))
+    .sort((a, b) => (a.sortYear || Infinity) - (b.sortYear || Infinity));
+const SITE = "https://cabinet.chrisgroskopf.com";
+const displayTitle = work.title.replace(/^[""]|[""]$/g, "");
+const description = [work.artist, work.medium.join(", "), work.yearCreated]
+    .filter(Boolean)
+    .join(" · ");
+const ogImage =
+    work.images.display[0]?.display ??
+    work.images.recto[0]?.display ??
+    undefined;
+
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "VisualArtwork",
+    name: displayTitle,
+    ...(work.titleAlt ? { alternateName: work.titleAlt } : {}),
+    creator: {
+        "@type": "Person",
+        name: work.artist,
+        ...(work.artistLife
+            ? { birthDate: work.artistLife.split("–")[0] }
+            : {}),
+        ...(work.artistNationality
+            ? { nationality: work.artistNationality }
+            : {}),
+    },
+    dateCreated: work.yearCreated,
+    ...(work.yearPrinted ? { datePublished: work.yearPrinted } : {}),
+    artMedium: work.medium.join(", "),
+    ...(work.support ? { artworkSurface: work.support } : {}),
+    ...(ogImage ? { image: ogImage } : {}),
+    url: `${SITE}/works/${Astro.params.id}`,
+    isPartOf: { "@type": "Collection", name: "Cabinet", url: SITE },
+};
 ---
 
-<Base title={displayTitle} description={description}>
-  <Header />
-  <main>
-    <DetailView {work} {relatedWorks} client:load />
-  </main>
+<Base
+    title={displayTitle}
+    description={description}
+    ogType="article"
+    {ogImage}
+    {jsonLd}
+>
+    <Header />
+    <main>
+        <DetailView {work} {relatedWorks} client:load />
+    </main>
 </Base>

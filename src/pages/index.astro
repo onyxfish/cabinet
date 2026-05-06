@@ -1,23 +1,44 @@
 ---
-import Base from '../layouts/Base.astro';
-import Header from '../components/Header.astro';
-import GridView from '../components/GridView.svelte';
-import { getCollection } from 'astro:content';
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import GridView from "../components/GridView.svelte";
+import { getCollection } from "astro:content";
 
-const allWorks = await getCollection('works');
+const allWorks = await getCollection("works");
 const works = allWorks
-  .map(e => e.data)
-  .sort((a, b) => {
-    const ay = a.sortYear || Infinity;
-    const by = b.sortYear || Infinity;
-    if (ay !== by) return ay - by;
-    return a.artist.localeCompare(b.artist) || a.title.localeCompare(b.title);
-  });
+    .map((e) => e.data)
+    .sort((a, b) => {
+        const ay = a.sortYear || Infinity;
+        const by = b.sortYear || Infinity;
+        if (ay !== by) return ay - by;
+        return (
+            a.artist.localeCompare(b.artist) || a.title.localeCompare(b.title)
+        );
+    });
+
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Cabinet — Prints & Drawings",
+    description:
+        "A personal collection of prints and drawings assembled by Christopher Groskopf beginning in 2016.",
+    url: "https://cabinet.chrisgroskopf.com",
+    author: {
+        "@type": "Person",
+        name: "Christopher Groskopf",
+        url: "https://chrisgroskopf.com",
+    },
+    numberOfItems: works.length,
+};
 ---
 
-<Base title="Cabinet" description="A personal collection of prints and drawings.">
-  <Header currentPage="collection" />
-  <main>
-    <GridView {works} client:load />
-  </main>
+<Base
+    title="Cabinet"
+    description="A personal collection of {works.length} prints and drawings spanning the 16th through 20th centuries."
+    {jsonLd}
+>
+    <Header currentPage="collection" />
+    <main>
+        <GridView {works} client:load />
+    </main>
 </Base>
