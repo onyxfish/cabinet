@@ -298,13 +298,14 @@ async function main() {
     const focusWikilinks = toStringArray(data['Focus'] ?? data['focus']);
     const focus = focusWikilinks.map(extractWikilinkName).filter(Boolean);
 
-    // Dimensions
-    const supportH = data['Support H.'] ?? data['supportH'] ?? null;
-    const supportW = data['Support W.'] ?? data['supportW'] ?? null;
-    const imageH = data['Image H.'] ?? data['imageH'] ?? null;
-    const imageW = data['Image W.'] ?? data['imageW'] ?? null;
+    // Dimensions — coerce to number to handle YAML string values
+    const toNum = (v: unknown) => v != null && v !== '' ? Number(v) : null;
+    const supportH = toNum(data['Support H.'] ?? data['supportH']);
+    const supportW = toNum(data['Support W.'] ?? data['supportW']);
+    const imageH = toNum(data['Image H.'] ?? data['imageH']);
+    const imageW = toNum(data['Image W.'] ?? data['imageW']);
     const dimensions = (supportH || supportW || imageH || imageW)
-      ? { supportH: supportH ?? null, supportW: supportW ?? null, imageH: imageH ?? null, imageW: imageW ?? null }
+      ? { supportH, supportW, imageH, imageW }
       : null;
 
     // Images — all fields stored as arrays

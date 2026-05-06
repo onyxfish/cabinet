@@ -2,10 +2,10 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 const dimensionsSchema = z.object({
-  supportH: z.number().nullable().optional(),
-  supportW: z.number().nullable().optional(),
-  imageH: z.number().nullable().optional(),
-  imageW: z.number().nullable().optional(),
+  supportH: z.coerce.number().nullable().optional(),
+  supportW: z.coerce.number().nullable().optional(),
+  imageH: z.coerce.number().nullable().optional(),
+  imageW: z.coerce.number().nullable().optional(),
 }).optional().nullable();
 
 const imageSizeSchema = z.object({
