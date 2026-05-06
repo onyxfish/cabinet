@@ -66,12 +66,17 @@
 
 <div>
   <div class="filter-bar">
-    <input
-      class="search-input"
-      type="search"
-      placeholder="Search artist, title…"
-      bind:value={query}
-    />
+    <div class="search-wrap">
+      <input
+        class="search-input"
+        type="search"
+        placeholder="Search artist, title…"
+        bind:value={query}
+      />
+      {#if query}
+        <button class="search-clear" onclick={() => query = ''} aria-label="Clear search">×</button>
+      {/if}
+    </div>
     <span class="filter-label">Medium</span>
     {#each ['All', ...allMedia] as medium (medium)}
       <button
@@ -106,6 +111,13 @@
     flex-wrap: wrap;
   }
 
+  .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-right: 16px;
+  }
+
   .search-input {
     font-family: var(--sans);
     font-size: 14px;
@@ -113,10 +125,9 @@
     background: transparent;
     border: none;
     border-bottom: 1px solid var(--border);
-    padding: 2px 0;
+    padding: 2px 20px 2px 0;
     width: 180px;
     outline: none;
-    margin-right: 16px;
     transition: border-color 0.15s;
   }
 
@@ -130,6 +141,21 @@
 
   /* Hide browser-native clear button on search inputs */
   .search-input::-webkit-search-cancel-button { display: none; }
+
+  .search-clear {
+    position: absolute;
+    right: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-faint);
+    font-size: 18px;
+    line-height: 1;
+    padding: 0 2px;
+    transition: color 0.15s;
+  }
+
+  .search-clear:hover { color: var(--text-dim); }
 
   .filter-label {
     font-family: var(--sans);

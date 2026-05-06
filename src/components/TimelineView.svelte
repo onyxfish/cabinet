@@ -222,5 +222,6 @@
     .jump-nav { display: none; }
     .sections { padding: 24px 20px; }
     .decade-label { font-size: 36px; }
+    .decade-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>

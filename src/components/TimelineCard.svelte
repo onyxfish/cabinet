@@ -32,7 +32,7 @@
     artist={work.artist}
     title={work.title}
     label={false}
-    style="width: 100%; height: 280px; object-fit: contain; background: var(--bg3); display: block; transform: {hovered ? 'scale(1.03)' : 'scale(1)'}; transition: transform 0.4s cubic-bezier(0.25,0,0,1);"
+    style="width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--bg3); display: block; transform: {hovered ? 'scale(1.03)' : 'scale(1)'}; transition: transform 0.4s cubic-bezier(0.25,0,0,1);"
   />
   <div class="overlay">
     <div class="title">{displayTitle}</div>
