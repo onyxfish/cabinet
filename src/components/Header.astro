@@ -1,180 +1,269 @@
 ---
 interface Props {
-  currentPage?: 'collection' | 'timeline' | 'about';
+    currentPage?: "collection" | "timeline" | "about";
 }
 const { currentPage } = Astro.props;
 ---
 
 <header>
-  <a href="/" class="site-name">Cabinet</a>
+    <a href="/" class="site-name">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            width="20"
+            height="20"
+            class="site-logo"
+            aria-hidden="true"
+        >
+            <rect x="1.5" y="1.5" width="17" height="4.667" fill="currentColor"
+            ></rect>
+            <rect x="7" y="3.083" width="6" height="1.5" fill="var(--bg)"
+            ></rect>
+            <rect
+                x="1.5"
+                y="7.667"
+                width="17"
+                height="4.667"
+                fill="currentColor"></rect>
+            <rect x="7" y="9.25" width="6" height="1.5" fill="var(--bg)"></rect>
+            <rect
+                x="1.5"
+                y="13.833"
+                width="17"
+                height="4.667"
+                fill="currentColor"></rect>
+            <rect x="7" y="15.417" width="6" height="1.5" fill="var(--bg)"
+            ></rect>
+        </svg>
+        Cabinet
+    </a>
 
-  <nav>
-    <a href="/" class:list={['nav-link', { active: currentPage === 'collection' }]}>Collection</a>
-    <a href="/timeline" class:list={['nav-link', { active: currentPage === 'timeline' }]}>Timeline</a>
-    <a href="/about" class:list={['nav-link', { active: currentPage === 'about' }]}>About</a>
-  </nav>
+    <nav>
+        <a
+            href="/"
+            class:list={["nav-link", { active: currentPage === "collection" }]}
+            >Collection</a
+        >
+        <a
+            href="/timeline"
+            class:list={["nav-link", { active: currentPage === "timeline" }]}
+            >Timeline</a
+        >
+        <a
+            href="/about"
+            class:list={["nav-link", { active: currentPage === "about" }]}
+            >About</a
+        >
+    </nav>
 
-  <div class="search-wrap">
-    <div id="pagefind-search"></div>
-  </div>
+    <div class="search-wrap">
+        <div id="pagefind-search"></div>
+    </div>
 
-  <button class="menu-btn" id="menu-btn" aria-label="Menu" aria-expanded="false">
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
-      <line x1="2" y1="5" x2="16" y2="5"/>
-      <line x1="2" y1="9" x2="16" y2="9"/>
-      <line x1="2" y1="13" x2="16" y2="13"/>
-    </svg>
-  </button>
+    <button
+        class="menu-btn"
+        id="menu-btn"
+        aria-label="Menu"
+        aria-expanded="false"
+    >
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+        >
+            <line x1="2" y1="5" x2="16" y2="5"></line>
+            <line x1="2" y1="9" x2="16" y2="9"></line>
+            <line x1="2" y1="13" x2="16" y2="13"></line>
+        </svg>
+    </button>
 </header>
 
 <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
-  <a href="/" class:list={['mobile-link', { active: currentPage === 'collection' }]}>Collection</a>
-  <a href="/timeline" class:list={['mobile-link', { active: currentPage === 'timeline' }]}>Timeline</a>
-  <a href="/about" class:list={['mobile-link', { active: currentPage === 'about' }]}>About</a>
+    <a
+        href="/"
+        class:list={["mobile-link", { active: currentPage === "collection" }]}
+        >Collection</a
+    >
+    <a
+        href="/timeline"
+        class:list={["mobile-link", { active: currentPage === "timeline" }]}
+        >Timeline</a
+    >
+    <a
+        href="/about"
+        class:list={["mobile-link", { active: currentPage === "about" }]}
+        >About</a
+    >
 </div>
 
 <script is:inline>
-  window.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const { PagefindUI } = await import('/pagefind/pagefind-ui.js');
-      new PagefindUI({
-        element: '#pagefind-search',
-        showSubResults: false,
-        showImages: false,
-        resetStyles: true,
-        translations: { placeholder: 'Search works, artists…' },
-      });
-    } catch {
-      // Pagefind not available (dev mode before first build)
-    }
+    window.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const { PagefindUI } = await import("/pagefind/pagefind-ui.js");
+            new PagefindUI({
+                element: "#pagefind-search",
+                showSubResults: false,
+                showImages: false,
+                resetStyles: true,
+                translations: { placeholder: "Search works, artists…" },
+            });
+        } catch {
+            // Pagefind not available (dev mode before first build)
+        }
 
-    const btn = document.getElementById('menu-btn');
-    const nav = document.getElementById('mobile-nav');
-    btn?.addEventListener('click', () => {
-      const open = nav?.classList.toggle('open');
-      btn.setAttribute('aria-expanded', String(open));
-      nav?.setAttribute('aria-hidden', String(!open));
+        const btn = document.getElementById("menu-btn");
+        const nav = document.getElementById("mobile-nav");
+        btn?.addEventListener("click", () => {
+            const open = nav?.classList.toggle("open");
+            btn.setAttribute("aria-expanded", String(open));
+            nav?.setAttribute("aria-hidden", String(!open));
+        });
     });
-  });
 </script>
 
 <style>
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    height: var(--header-h);
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    gap: 32px;
-  }
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: var(--header-h);
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
 
-  .site-name {
-    font-family: var(--serif);
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    color: var(--accent);
-    flex-shrink: 0;
-    text-decoration: none;
-  }
+    .site-name {
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: var(--accent);
+        flex-shrink: 0;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-  nav {
-    display: flex;
-    gap: 4px;
-    flex: 1;
-  }
+    .site-logo {
+        display: block;
+        flex-shrink: 0;
+        transform: translateY(-1px);
+    }
 
-  .nav-link {
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    padding: 4px 12px;
-    border-bottom: 1px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
-    text-decoration: none;
-  }
+    nav {
+        display: flex;
+        gap: 4px;
+        flex: 1;
+    }
 
-  .nav-link:hover,
-  .nav-link.active {
-    color: var(--text);
-  }
+    .nav-link {
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        padding: 4px 12px;
+        border-bottom: 1px solid transparent;
+        transition:
+            color 0.2s,
+            border-color 0.2s;
+        text-decoration: none;
+    }
 
-  .nav-link.active {
-    border-bottom-color: var(--accent);
-  }
+    .nav-link:hover,
+    .nav-link.active {
+        color: var(--text);
+    }
 
-  .search-wrap {
-    min-width: 200px;
-    align-self: center;
-  }
+    .nav-link.active {
+        border-bottom-color: var(--accent);
+    }
 
-  .menu-btn {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text-dim);
-    padding: 4px;
-    margin-left: auto;
-    flex-shrink: 0;
-  }
+    .search-wrap {
+        min-width: 200px;
+        align-self: center;
+    }
 
-  .mobile-nav {
-    display: none;
-  }
-
-  @media (max-width: 640px) {
-    nav, .search-wrap { display: none; }
-    .menu-btn { display: flex; align-items: center; }
+    .menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-dim);
+        padding: 4px;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
 
     .mobile-nav {
-      position: sticky;
-      top: var(--header-h);
-      z-index: 99;
-      background: rgba(244, 239, 232, 0.97);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      flex-direction: column;
-      padding: 8px 0;
+        display: none;
     }
 
-    .mobile-nav.open { display: flex; }
+    @media (max-width: 640px) {
+        nav,
+        .search-wrap {
+            display: none;
+        }
+        .menu-btn {
+            display: flex;
+            align-items: center;
+        }
 
-    .mobile-link {
-      font-family: var(--sans);
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      padding: 12px 24px;
-      text-decoration: none;
-      border-left: 2px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
+        .mobile-nav {
+            position: sticky;
+            top: var(--header-h);
+            z-index: 99;
+            background: rgba(244, 239, 232, 0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            flex-direction: column;
+            padding: 8px 0;
+        }
+
+        .mobile-nav.open {
+            display: flex;
+        }
+
+        .mobile-link {
+            font-family: var(--sans);
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 12px 24px;
+            text-decoration: none;
+            border-left: 2px solid transparent;
+            transition:
+                color 0.15s,
+                border-color 0.15s;
+        }
+
+        .mobile-link:hover {
+            color: var(--text);
+        }
+        .mobile-link.active {
+            color: var(--text);
+            border-left-color: var(--accent);
+        }
     }
 
-    .mobile-link:hover { color: var(--text); }
-    .mobile-link.active {
-      color: var(--text);
-      border-left-color: var(--accent);
+    /* Pagefind UI overrides — scoped to header */
+    :global(#pagefind-search .pagefind-ui) {
+        --pagefind-ui-font: var(--sans);
+        --pagefind-ui-primary: var(--accent);
+        --pagefind-ui-text: var(--text);
+        --pagefind-ui-background: var(--bg2);
+        --pagefind-ui-border: var(--border);
+        --pagefind-ui-border-width: 1px;
+        --pagefind-ui-border-radius: 2px;
+        --pagefind-ui-scale: 0.85;
     }
-  }
-
-  /* Pagefind UI overrides — scoped to header */
-  :global(#pagefind-search .pagefind-ui) {
-    --pagefind-ui-font: var(--sans);
-    --pagefind-ui-primary: var(--accent);
-    --pagefind-ui-text: var(--text);
-    --pagefind-ui-background: var(--bg2);
-    --pagefind-ui-border: var(--border);
-    --pagefind-ui-border-width: 1px;
-    --pagefind-ui-border-radius: 2px;
-    --pagefind-ui-scale: 0.85;
-  }
 </style>
