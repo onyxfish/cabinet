@@ -2,17 +2,13 @@
  * Cabinet sync pipeline
  *
  * Reads the Obsidian vault, extracts public fields from each print/drawing note,
- * uploads images to Cloudflare R2, and writes JSON content collection entries.
+ * processes images into responsive variants, and writes JSON content collection entries.
+ * Images are written to public/images/ and served alongside the HTML by Cloudflare Pages.
  *
  * Run with: pnpm sync
  *
  * Required environment variables (set in .env):
- *   VAULT_PATH          - Absolute path to the vault root
- *   R2_ACCOUNT_ID       - Cloudflare account ID
- *   R2_ACCESS_KEY_ID    - R2 API token key ID
- *   R2_SECRET_ACCESS_KEY - R2 API token secret
- *   R2_BUCKET_NAME      - R2 bucket name
- *   R2_PUBLIC_URL       - Public base URL for R2 (e.g. https://pub-abc.r2.dev)
+ *   VAULT_PATH - Absolute path to the vault root
  */
 
 import 'dotenv/config';
@@ -21,7 +17,6 @@ import path from 'node:path';
 import { glob } from 'node:fs/promises';
 import matter from 'gray-matter';
 import sharp from 'sharp';
-import { S3Client, HeadObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -30,20 +25,7 @@ const PRINTS_DIR = path.join(VAULT, 'Prints & Drawings');
 const ARTISTS_DIR = path.join(VAULT, 'Artists');
 const CONTENT_DIR = path.join(import.meta.dirname, '..', 'src', 'content', 'works');
 const MANIFEST_PATH = path.join(import.meta.dirname, '.image-manifest.json');
-
-const R2_BUCKET = process.env.R2_BUCKET_NAME!;
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL!;
-
-// ─── R2 Client ───────────────────────────────────────────────────────────────
-
-const s3 = new S3Client({
-  region: 'auto',
-  endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
-});
+const PUBLIC_IMAGES_DIR = path.join(import.meta.dirname, '..', 'public', 'images');
 
 // ─── Manifest ────────────────────────────────────────────────────────────────
 
@@ -110,6 +92,13 @@ function resolveImagePath(wikilink: string): string | null {
   return fs.existsSync(abs) ? abs : null;
 }
 
+// Treat only actual boolean true or the string "true"/"yes"/"checked" as true
+function toBoolean(val: unknown): boolean {
+  if (typeof val === 'boolean') return val;
+  if (typeof val === 'string') return ['true', 'yes', 'checked'].includes(val.toLowerCase().trim());
+  return false;
+}
+
 // Normalise various YAML shapes into string[]
 function toStringArray(val: unknown): string[] {
   if (!val) return [];
@@ -157,21 +146,9 @@ const IMAGE_VARIANTS = [
   { size: 'zoom',    maxPx: 2800, quality: 88 },
 ] as const;
 
-const hasR2 = !!(
-  process.env.R2_ACCOUNT_ID &&
-  process.env.R2_ACCESS_KEY_ID &&
-  process.env.R2_SECRET_ACCESS_KEY &&
-  R2_BUCKET &&
-  R2_PUBLIC_URL
-);
-
-if (!hasR2) {
-  console.warn('⚠️  R2 env vars not set — images will be skipped. Set R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL in .env');
-}
-
-async function uploadVariant(
+async function processVariant(
   localPath: string,
-  r2Key: string,
+  fileKey: string,
   maxPx: number,
   quality: number,
   manifestKey: string,
@@ -189,15 +166,11 @@ async function uploadVariant(
     .jpeg({ quality })
     .toBuffer();
 
-  await s3.send(new PutObjectCommand({
-    Bucket: R2_BUCKET,
-    Key: r2Key,
-    Body: buf,
-    ContentType: 'image/jpeg',
-    CacheControl: 'public, max-age=31536000, immutable',
-  }));
+  const destPath = path.join(PUBLIC_IMAGES_DIR, fileKey);
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  fs.writeFileSync(destPath, buf);
 
-  const url = `${R2_PUBLIC_URL.replace(/\/$/, '')}/${r2Key}`;
+  const url = `/images/${fileKey}`;
   manifest[manifestKey] = { url, mtime: stat.mtimeMs };
   return url;
 }
@@ -213,18 +186,17 @@ async function resolveImages(
   for (let i = 0; i < wikilinkArray.length; i++) {
     const localPath = resolveImagePath(wikilinkArray[i]);
     if (!localPath) continue;
-    if (!hasR2) continue;
 
     const stat = fs.statSync(localPath);
     const sizes: Partial<ImageSizes> = {};
 
     for (const { size, maxPx, quality } of IMAGE_VARIANTS) {
-      const r2Key = `works/${slug}/${typeKey}-${i}-${size}.jpg`;
+      const fileKey = `works/${slug}/${typeKey}-${i}-${size}.jpg`;
       const manifestKey = `${localPath}::${size}`;
       const isCached = manifest[manifestKey]?.mtime === stat.mtimeMs;
 
       process.stdout.write(isCached ? '·' : '↑');
-      sizes[size] = await uploadVariant(localPath, r2Key, maxPx, quality, manifestKey, manifest, stat);
+      sizes[size] = await processVariant(localPath, fileKey, maxPx, quality, manifestKey, manifest, stat);
       isCached ? stats.skipped++ : stats.uploaded++;
     }
 
@@ -347,8 +319,8 @@ async function main() {
       yearPrinted: data['Year Printed'] ? String(data['Year Printed']) : null,
       sortYear: Number(data['Sort Year'] ?? 0),
       yearAcquired: data['Year Acquired'] ? Number(data['Year Acquired']) : null,
-      handSig: Boolean(data['Hand Sig?'] ?? data['handSig'] ?? false),
-      plateSig: Boolean(data['Plate Sig?'] ?? data['plateSig'] ?? false),
+      handSig: toBoolean(data['Hand Sig?'] ?? data['handSig']),
+      plateSig: toBoolean(data['Plate Sig?'] ?? data['plateSig']),
       dimensions,
       catalogue,
       catNum: data['Cat. Num.'] != null ? String(data['Cat. Num.']) : null,
@@ -367,11 +339,7 @@ async function main() {
 
   console.log(`\n✓ Sync complete`);
   console.log(`  Works:  ${stats.works} written, ${stats.skipped} skipped`);
-  if (hasR2) {
-    console.log(`  Images: ${stats.images.uploaded} uploaded, ${stats.images.skipped} unchanged`);
-  } else {
-    console.log(`  Images: skipped (no R2 config)`);
-  }
+  console.log(`  Images: ${stats.images.uploaded} written, ${stats.images.skipped} unchanged`);
 }
 
 main().catch(err => {
