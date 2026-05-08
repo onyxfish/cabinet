@@ -37,3 +37,5 @@ public/images/
 scripts/.image-manifest.json
 
 .claude/worktrees
+
+__pycache__
