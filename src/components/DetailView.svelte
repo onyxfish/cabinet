@@ -125,8 +125,7 @@
     );
     const hasImages: boolean = $derived(imageViews.length > 0);
     const canNavigate: boolean = $derived(
-        imageViews.length > 1 ||
-            (activeView?.images.length ?? 0) > 1,
+        imageViews.length > 1 || (activeView?.images.length ?? 0) > 1,
     );
     const hasPrev: boolean = $derived(
         (() => {
@@ -162,9 +161,7 @@
             if (newViewIdx >= 0 && newViewIdx < imageViews.length) {
                 activeViewKey = imageViews[newViewIdx].key;
                 activeImageIndex =
-                    dir === 1
-                        ? 0
-                        : imageViews[newViewIdx].images.length - 1;
+                    dir === 1 ? 0 : imageViews[newViewIdx].images.length - 1;
             }
         }
     }
@@ -224,8 +221,7 @@
                         touchStartX = e.touches[0].clientX;
                     }}
                     ontouchend={(e) => {
-                        const dx =
-                            e.changedTouches[0].clientX - touchStartX;
+                        const dx = e.changedTouches[0].clientX - touchStartX;
                         if (Math.abs(dx) > 50) navigate(dx > 0 ? -1 : 1);
                     }}
                     style="cursor: {activeImage ? 'zoom-in' : 'default'}"
@@ -254,7 +250,9 @@
                                     e.stopPropagation();
                                     navigate(-1);
                                 }}
-                            >&#8249;</div>
+                            >
+                                &#8249;
+                            </div>
                         {/if}
                         {#if hasNext}
                             <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
@@ -264,7 +262,9 @@
                                     e.stopPropagation();
                                     navigate(1);
                                 }}
-                            >&#8250;</div>
+                            >
+                                &#8250;
+                            </div>
                         {/if}
                     {/if}
                 </div>
@@ -338,16 +338,16 @@
                                 class="ref-link"
                                 href="https://www.wikidata.org/wiki/{work.artistWikidataId}"
                                 target="_blank"
-                                rel="noopener noreferrer"
-                            >Wikidata</a>
+                                rel="noopener noreferrer">Wikidata</a
+                            >
                         {/if}
                         {#if work.artistUlanId}
                             <a
                                 class="ref-link"
                                 href="https://vocab.getty.edu/ulan/{work.artistUlanId}"
                                 target="_blank"
-                                rel="noopener noreferrer"
-                            >ULAN</a>
+                                rel="noopener noreferrer">ULAN</a
+                            >
                         {/if}
                     </div>
                 {/if}
@@ -439,11 +439,7 @@
                             {work.catalogue ??
                                 ""}{#if work.catNum}{work.catalogue
                                     ? ", "
-                                    : ""}no. {work.catNum}{/if}{#if work.catPage}<span
-                                    class="meta-sub"
-                                >
-                                    (p. {work.catPage})</span
-                                >{/if}
+                                    : ""}no. {work.catNum}{/if}
                         </div>
                     </div>
                 </AccordionSection>
@@ -510,7 +506,9 @@
                     e.stopPropagation();
                     navigate(-1);
                 }}
-            >&#8249;</div>
+            >
+                &#8249;
+            </div>
         {/if}
         {#if hasNext}
             <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
@@ -520,7 +518,9 @@
                     e.stopPropagation();
                     navigate(1);
                 }}
-            >&#8250;</div>
+            >
+                &#8250;
+            </div>
         {/if}
     </div>
 {/if}
@@ -593,8 +593,12 @@
         opacity: 1;
     }
 
-    .nav-prev { left: 0; }
-    .nav-next { right: 0; }
+    .nav-prev {
+        left: 0;
+    }
+    .nav-next {
+        right: 0;
+    }
 
     .nav-arrow:hover {
         color: var(--text);
@@ -619,8 +623,12 @@
         color: rgba(255, 255, 255, 0.9);
     }
 
-    .lb-prev { left: 16px; }
-    .lb-next { right: 16px; }
+    .lb-prev {
+        left: 16px;
+    }
+    .lb-next {
+        right: 16px;
+    }
 
     .multi-thumbs {
         display: flex;
@@ -750,7 +758,9 @@
         color: var(--text-faint);
         text-decoration: none;
         border-bottom: 1px solid var(--border);
-        transition: color 0.12s, border-color 0.12s;
+        transition:
+            color 0.12s,
+            border-color 0.12s;
     }
 
     .ref-link:hover {
