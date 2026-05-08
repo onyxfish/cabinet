@@ -63,52 +63,44 @@
     // Build available image views
     type ImageSize = { thumb: string; display: string; zoom: string };
     type ImageView = { key: string; label: string; images: ImageSize[] };
+
+    function addViews(
+        views: ImageView[],
+        key: string,
+        label: string,
+        images: ImageSize[],
+    ) {
+        if (images.length === 0) return;
+        if (images.length === 1) {
+            views.push({ key, label, images });
+        } else {
+            images.forEach((img, i) =>
+                views.push({
+                    key: `${key}-${i}`,
+                    label: `${label}`,
+                    images: [img],
+                }),
+            );
+        }
+    }
+
     const imageViews: ImageView[] = $derived(
         (() => {
             const views: ImageView[] = [];
-            if (work.images.display.length > 0)
-                views.push({
-                    key: "display",
-                    label: "Image",
-                    images: work.images.display,
-                });
+            addViews(views, "display", "Image", work.images.display);
 
             // Skip recto if it duplicates the display image
             const rectoIsDupe =
                 work.images.recto.length > 0 &&
                 work.images.display.length > 0 &&
                 work.images.recto[0].display === work.images.display[0].display;
-            if (work.images.recto.length > 0 && !rectoIsDupe)
-                views.push({
-                    key: "recto",
-                    label: "Recto",
-                    images: work.images.recto,
-                });
+            if (!rectoIsDupe)
+                addViews(views, "recto", "Recto", work.images.recto);
 
-            if (work.images.verso.length > 0)
-                views.push({
-                    key: "verso",
-                    label: "Verso",
-                    images: work.images.verso,
-                });
-            if (work.images.plateSig.length > 0)
-                views.push({
-                    key: "plateSig",
-                    label: "Plate Sig.",
-                    images: work.images.plateSig,
-                });
-            if (work.images.handSig.length > 0)
-                views.push({
-                    key: "handSig",
-                    label: "Hand Sig.",
-                    images: work.images.handSig,
-                });
-            if (work.images.watermark.length > 0)
-                views.push({
-                    key: "watermark",
-                    label: "Watermark",
-                    images: work.images.watermark,
-                });
+            addViews(views, "verso", "Verso", work.images.verso);
+            addViews(views, "plateSig", "Plate Sig.", work.images.plateSig);
+            addViews(views, "handSig", "Hand Sig.", work.images.handSig);
+            addViews(views, "watermark", "Watermark", work.images.watermark);
             return views;
         })(),
     );
@@ -233,7 +225,6 @@
                             alt={displayTitle}
                             class="main-image"
                         />
-                        <span class="enlarge-hint">Click to enlarge</span>
                     {:else}
                         <div class="img-ph main-ph">
                             <div class="img-ph-inner">
@@ -270,21 +261,6 @@
                     {/if}
                 </div>
 
-                <!-- Thumbnail strip for multi-image views -->
-                {#if (activeView?.images.length ?? 0) > 1}
-                    <div class="multi-thumbs">
-                        {#each activeView?.images ?? [] as img, i (i)}
-                            <button
-                                class="multi-thumb"
-                                class:active={activeImageIndex === i}
-                                onclick={() => (activeImageIndex = i)}
-                            >
-                                <img src={img.thumb} alt="View {i + 1}" />
-                            </button>
-                        {/each}
-                    </div>
-                {/if}
-
                 <!-- View switcher -->
                 {#if imageViews.length > 1}
                     <div class="view-switcher">
@@ -294,7 +270,12 @@
                                 class:active={activeViewKey === view.key}
                                 onclick={() => setView(view.key)}
                             >
-                                {view.label}
+                                <img
+                                    src={view.images[0].thumb}
+                                    alt={view.label}
+                                    class="view-btn-thumb"
+                                />
+                                <span class="view-btn-label">{view.label}</span>
                             </button>
                         {/each}
                     </div>
@@ -640,62 +621,52 @@
         right: 16px;
     }
 
-    .multi-thumbs {
+    .view-switcher {
         display: flex;
-        gap: 4px;
         flex-wrap: wrap;
-        max-width: 600px;
+        justify-content: center;
+        max-width: 800px;
         width: 100%;
     }
 
-    .multi-thumb {
-        width: 64px;
-        height: 64px;
-        padding: 0;
+    .view-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 10px;
+        background: var(--bg2);
         border: 2px solid transparent;
         cursor: pointer;
-        background: none;
-        overflow: hidden;
-        transition: border-color 0.15s;
+        transition: border-color 0.12s;
     }
 
-    .multi-thumb.active {
-        border-color: var(--accent);
-    }
-    .multi-thumb:hover:not(.active) {
-        border-color: var(--border);
-    }
-
-    .multi-thumb img {
-        width: 100%;
-        height: 100%;
+    .view-btn-thumb {
+        width: 48px;
+        height: 48px;
         object-fit: cover;
         display: block;
     }
 
-    .view-switcher {
-        display: flex;
-        gap: 3px;
-        flex-wrap: wrap;
-    }
-
-    .view-btn {
+    .view-btn-label {
         font-family: var(--sans);
-        font-size: 12px;
-        letter-spacing: 0.08em;
+        font-size: 11px;
+        letter-spacing: 0.07em;
         text-transform: uppercase;
-        padding: 5px 14px;
-        background: var(--bg2);
         color: var(--text-dim);
-        border: 1px solid var(--border);
-        cursor: pointer;
-        transition: all 0.12s;
+        white-space: nowrap;
     }
 
     .view-btn.active {
-        background: var(--text);
-        color: var(--bg);
-        border-color: var(--text);
+        border-color: var(--accent-lt);
+    }
+
+    .view-btn.active .view-btn-label {
+        color: var(--text);
+    }
+
+    .view-btn:hover:not(.active) {
+        border-color: var(--border);
     }
 
     /* Metadata column */
