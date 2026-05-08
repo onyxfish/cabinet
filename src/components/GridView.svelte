@@ -47,14 +47,17 @@
     );
 
     // Responsive column count — mirrors CSS breakpoints
-    let columnCount = $state(4);
+    const getColumnCount = () => {
+        if (typeof window === "undefined") return 4;
+        const w = window.innerWidth;
+        return w <= 768 ? 2 : w <= 1200 ? 3 : 4;
+    };
+    let columnCount = $state(getColumnCount());
 
     onMount(() => {
         const update = () => {
-            const w = window.innerWidth;
-            columnCount = w <= 768 ? 2 : w <= 1200 ? 3 : 4;
+            columnCount = getColumnCount();
         };
-        update();
         window.addEventListener("resize", update);
         return () => window.removeEventListener("resize", update);
     });
