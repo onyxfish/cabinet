@@ -552,13 +552,14 @@
 
     .main-image-wrap {
         position: relative;
-        max-width: 600px;
+        max-width: 800px;
         width: 100%;
+        height: 65vh;
     }
 
     .main-image {
         width: 100%;
-        max-height: 65vh;
+        height: 100%;
         object-fit: contain;
         display: block;
     }
