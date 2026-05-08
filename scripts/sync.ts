@@ -20,7 +20,11 @@ import sharp from 'sharp';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const VAULT = process.env.VAULT_PATH || '/Users/cgroskop/Documents/obsidian/life/Collections';
+const VAULT = process.env.VAULT_PATH;
+if (!VAULT) {
+  console.error('Error: VAULT_PATH environment variable is required. Set it in .env or your shell.');
+  process.exit(1);
+}
 const PRINTS_DIR = path.join(VAULT, 'Prints & Drawings');
 const ARTISTS_DIR = path.join(VAULT, 'Artists');
 const CONTENT_DIR = path.join(import.meta.dirname, '..', 'src', 'content', 'works');

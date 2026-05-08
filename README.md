@@ -1,43 +1,44 @@
-# Astro Starter Kit: Minimal
+# Cabinet
+
+Source for [cabinet.chrisgroskopf.com](https://cabinet.chrisgroskopf.com), a personal collection of prints and drawings assembled since 2016. The site presents European and American works spanning the sixteenth through twentieth centuries, with an emphasis on etching.
+
+## Architecture
+
+The collection is managed as Obsidian notes and synced into this repo as a static Astro site deployed on Cloudflare Pages. The pipeline reads frontmatter from vault notes, processes images into responsive variants, and writes JSON content collection entries consumed by Astro at build time.
+
+```
+Obsidian vault  ──pnpm sync──►  src/content/works/*.json
+                                public/images/
+                                     │
+                               pnpm build
+                                     │
+                                  dist/  ──► Cloudflare Pages
+```
+
+## Setup
 
 ```sh
-pnpm create astro@latest -- --template minimal
+pnpm install
+cp .env.example .env   # set VAULT_PATH to your vault root
+pnpm sync              # populate content and images from vault
+pnpm dev               # local dev server at localhost:4321
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Commands
 
-## 🚀 Project Structure
+| Command | Action |
+| :--- | :--- |
+| `pnpm sync` | Sync content and images from Obsidian vault |
+| `pnpm dev` | Start dev server at `localhost:4321` |
+| `pnpm build` | Build site to `./dist/` |
+| `pnpm deploy` | Build and deploy to Cloudflare Pages |
 
-Inside of your Astro project, you'll see the following folders and files:
+## Environment variables
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+| Variable | Description |
+| :--- | :--- |
+| `VAULT_PATH` | Absolute path to the Obsidian vault root |
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## License
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+All content and images are licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). Source code is MIT.
