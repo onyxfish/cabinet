@@ -20,6 +20,7 @@
         artistNationality?: string | null;
         artistWikidataId?: string | null;
         artistUlanId?: string | null;
+        artistRkdId?: string | null;
         after: string[];
         medium: string[];
         support?: string | null;
@@ -331,7 +332,7 @@
                 {#if work.artistLife}
                     <div class="artist-life">{work.artistLife}</div>
                 {/if}
-                {#if work.artistWikidataId || work.artistUlanId}
+                {#if work.artistWikidataId || work.artistUlanId || work.artistRkdId}
                     <div class="artist-refs">
                         {#if work.artistWikidataId}
                             <a
@@ -347,6 +348,14 @@
                                 href="https://vocab.getty.edu/ulan/{work.artistUlanId}"
                                 target="_blank"
                                 rel="noopener noreferrer">ULAN</a
+                            >
+                        {/if}
+                        {#if work.artistRkdId}
+                            <a
+                                class="ref-link"
+                                href="https://rkd.nl/artists/{work.artistRkdId}"
+                                target="_blank"
+                                rel="noopener noreferrer">RKD</a
                             >
                         {/if}
                     </div>
@@ -378,7 +387,7 @@
                     <div class="meta-row">
                         <div class="meta-label">Medium</div>
                         <div class="meta-value">
-                            {work.medium.join(" and ")}
+                            {work.medium.join(", ")}
                         </div>
                     </div>
                 {/if}

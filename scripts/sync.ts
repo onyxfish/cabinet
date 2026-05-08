@@ -113,7 +113,7 @@ function toStringArray(val: unknown): string[] {
 
 // ─── Artist Lookup ───────────────────────────────────────────────────────────
 
-type ArtistInfo = { life: string | null; nationality: string | null; wikidataId: string | null; ulanId: string | null };
+type ArtistInfo = { life: string | null; nationality: string | null; wikidataId: string | null; ulanId: string | null; rkdId: string | null };
 const artistCache: Record<string, ArtistInfo> = {};
 
 function lookupArtist(name: string): ArtistInfo {
@@ -121,7 +121,7 @@ function lookupArtist(name: string): ArtistInfo {
 
   const filePath = path.join(ARTISTS_DIR, `${name}.md`);
   if (!fs.existsSync(filePath)) {
-    artistCache[name] = { life: null, nationality: null, wikidataId: null, ulanId: null };
+    artistCache[name] = { life: null, nationality: null, wikidataId: null, ulanId: null, rkdId: null };
     return artistCache[name];
   }
 
@@ -136,7 +136,8 @@ function lookupArtist(name: string): ArtistInfo {
   const nationality = natArr.length > 0 ? natArr[0] : null;
   const wikidataId = data['Wikidata'] ? String(data['Wikidata']) : null;
   const ulanId = data['ULAN'] ? String(data['ULAN']) : null;
-  artistCache[name] = { life, nationality, wikidataId, ulanId };
+  const rkdId = data['RKDArtists'] ? String(data['RKDArtists']) : null;
+  artistCache[name] = { life, nationality, wikidataId, ulanId, rkdId };
   return artistCache[name];
 }
 
@@ -251,7 +252,7 @@ async function main() {
     const artistName = artistWikilinks.length > 0
       ? extractWikilinkName(artistWikilinks[0])
       : 'Unknown';
-    const { life: artistLife, nationality: artistNationality, wikidataId: artistWikidataId, ulanId: artistUlanId } = lookupArtist(artistName);
+    const { life: artistLife, nationality: artistNationality, wikidataId: artistWikidataId, ulanId: artistUlanId, rkdId: artistRkdId } = lookupArtist(artistName);
 
     const slug = makeSlug(artistName, title, seenSlugs);
     process.stdout.write(`  [${workNum}/${total}] ${slug} `);
@@ -315,6 +316,7 @@ async function main() {
       artistNationality: artistNationality ?? null,
       artistWikidataId: artistWikidataId ?? null,
       artistUlanId: artistUlanId ?? null,
+      artistRkdId: artistRkdId ?? null,
       after,
       medium,
       support: data['Support'] ?? null,

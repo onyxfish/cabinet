@@ -55,6 +55,7 @@ const jsonLd = {
             const refs = [
                 work.artistWikidataId ? `https://www.wikidata.org/wiki/${work.artistWikidataId}` : null,
                 work.artistUlanId ? `https://vocab.getty.edu/ulan/${work.artistUlanId}` : null,
+                work.artistRkdId ? `https://rkd.nl/artists/${work.artistRkdId}` : null,
             ].filter(Boolean) as string[];
             return refs.length > 0 ? { sameAs: refs.length === 1 ? refs[0] : refs } : {};
         })(),

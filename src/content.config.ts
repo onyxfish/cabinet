@@ -36,6 +36,7 @@ const works = defineCollection({
     artistNationality: z.string().optional().nullable(),
     artistWikidataId: z.string().optional().nullable(),
     artistUlanId: z.string().optional().nullable(),
+    artistRkdId: z.string().optional().nullable(),
     after: z.array(z.string()).default([]),
     medium: z.array(z.string()).default([]),
     support: z.string().optional().nullable(),
