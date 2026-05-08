@@ -412,7 +412,7 @@
                             <div class="meta-value">
                                 {[
                                     work.handSig && "Hand-signed",
-                                    work.plateSig && "Plate signature",
+                                    work.plateSig && "Signed in the plate",
                                 ]
                                     .filter(Boolean)
                                     .join("; ")}
