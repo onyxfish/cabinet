@@ -29,6 +29,7 @@ const relatedWorks = allWorks
     .sort((a, b) => (a.sortYear || Infinity) - (b.sortYear || Infinity));
 const SITE = "https://cabinet.chrisgroskopf.com";
 const displayTitle = work.title.replace(/^[""]|[""]$/g, "");
+const pageTitle = work.artist ? `${displayTitle} · ${work.artist}` : displayTitle;
 const description = [work.artist, work.medium.join(", "), work.yearCreated]
     .filter(Boolean)
     .join(" · ");
@@ -71,7 +72,7 @@ const jsonLd = {
 ---
 
 <Base
-    title={displayTitle}
+    title={pageTitle}
     description={description}
     ogType="article"
     {ogImage}
