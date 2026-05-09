@@ -52,6 +52,7 @@ const works = defineCollection({
     catNum: z.string().optional().nullable(),
     catPage: z.number().optional().nullable(),
     focus: z.array(z.string()).default([]),
+    description: z.string().optional().nullable(),
     images: imagesSchema,
   }),
 });

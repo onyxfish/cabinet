@@ -17,6 +17,7 @@ import path from 'node:path';
 import { glob } from 'node:fs/promises';
 import matter from 'gray-matter';
 import sharp from 'sharp';
+import { marked } from 'marked';
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -25,8 +26,9 @@ if (!VAULT) {
   console.error('Error: VAULT_PATH environment variable is required. Set it in .env or your shell.');
   process.exit(1);
 }
-const PRINTS_DIR = path.join(VAULT, 'Prints & Drawings');
-const ARTISTS_DIR = path.join(VAULT, 'Artists');
+const VAULT_ROOT: string = VAULT;
+const PRINTS_DIR = path.join(VAULT_ROOT, 'Prints & Drawings');
+const ARTISTS_DIR = path.join(VAULT_ROOT, 'Artists');
 const CONTENT_DIR = path.join(import.meta.dirname, '..', 'src', 'content', 'works');
 const MANIFEST_PATH = path.join(import.meta.dirname, '.image-manifest.json');
 const PUBLIC_IMAGES_DIR = path.join(import.meta.dirname, '..', 'public', 'images');
@@ -71,6 +73,40 @@ function makeSlug(artist: string, title: string, seen: Set<string>): string {
   return slug;
 }
 
+// ─── Cabinet Description Extraction ─────────────────────────────────────────
+
+function extractCabinetSection(body: string): string | null {
+  const lines = body.split('\n');
+  let inSection = false;
+  const sectionLines: string[] = [];
+
+  for (const line of lines) {
+    if (/^##\s+Cabinet\s*$/.test(line.trimEnd())) {
+      inSection = true;
+      continue;
+    }
+    if (inSection) {
+      if (/^##\s/.test(line)) break;
+      sectionLines.push(line);
+    }
+  }
+
+  if (!inSection) return null;
+  const text = sectionLines.join('\n').trim();
+  return text.length > 0 ? text : null;
+}
+
+function stripWikilinks(text: string): string {
+  return text.replace(/\[\[(?:[^\]|]+\|)?([^\]]+)\]\]/g, '$1');
+}
+
+function descriptionToHtml(body: string): string | null {
+  const section = extractCabinetSection(body);
+  if (!section) return null;
+  const md = stripWikilinks(section);
+  return marked.parse(md) as string;
+}
+
 // ─── Wikilink Parsing ────────────────────────────────────────────────────────
 
 function extractWikilinkName(raw: string): string {
@@ -92,7 +128,7 @@ function resolveImagePath(wikilink: string): string | null {
   if (!linkPath) return null;
   // linkPath is like "Collections/Media/PXL_20230824.jpg"
   const filename = path.basename(linkPath);
-  const abs = path.join(VAULT, 'Media', filename);
+  const abs = path.join(VAULT_ROOT, 'Media', filename);
   return fs.existsSync(abs) ? abs : null;
 }
 
@@ -233,7 +269,7 @@ async function main() {
   for (const filePath of files) {
     workNum++;
     const raw = fs.readFileSync(filePath, 'utf-8');
-    const { data } = matter(raw);
+    const { data, content } = matter(raw);
 
     // Skip deaccessioned works
     const deaccessioned = data['Deaccessioned'] ?? data['deaccessioned'];
@@ -332,6 +368,7 @@ async function main() {
       catNum: data['Cat. Num.'] != null ? String(data['Cat. Num.']) : null,
       catPage: data['Cat. Page'] != null ? Number(data['Cat. Page']) : null,
       focus,
+      description: descriptionToHtml(content),
       images,
     };
 

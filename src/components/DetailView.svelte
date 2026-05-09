@@ -34,6 +34,7 @@
         catalogue?: string | null;
         catNum?: string | null;
         catPage?: number | null;
+        description?: string | null;
         images: {
             display: { thumb: string; display: string; zoom: string }[];
             recto: { thumb: string; display: string; zoom: string }[];
@@ -347,6 +348,12 @@
                 <div class="artist-block">
                     <div class="meta-label">After</div>
                     <div class="artist-name">{work.after.join(", ")}</div>
+                </div>
+            {/if}
+
+            {#if work.description}
+                <div class="description">
+                    {@html work.description}
                 </div>
             {/if}
 
@@ -747,6 +754,35 @@
     .ref-link:hover {
         color: var(--text-dim);
         border-color: var(--text-dim);
+    }
+
+    .description {
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.65;
+        color: var(--text-dim);
+    }
+
+    .description :global(p) {
+        margin: 0 0 0.75em;
+    }
+
+    .description :global(p:last-child) {
+        margin-bottom: 0;
+    }
+
+    .description :global(a) {
+        color: var(--text-dim);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .description :global(a:hover) {
+        color: var(--text);
+    }
+
+    .description :global(strong) {
+        color: var(--text);
     }
 
     .divider {
