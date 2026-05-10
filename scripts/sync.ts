@@ -96,14 +96,20 @@ function extractCabinetSection(body: string): string | null {
   return text.length > 0 ? text : null;
 }
 
-function stripWikilinks(text: string): string {
-  return text.replace(/\[\[(?:[^\]|]+\|)?([^\]]+)\]\]/g, '$1');
+function resolveWikilinks(text: string, noteNameToSlug: Map<string, string>): string {
+  return text.replace(/\[\[([^\]|]+?)(?:\|([^\]]+))?\]\]/g, (_, target, alias) => {
+    const display = alias ?? path.basename(target);
+    const noteBasename = path.basename(target);
+    const slug = noteNameToSlug.get(noteBasename);
+    if (slug) return `[${display}](/works/${slug})`;
+    return display;
+  });
 }
 
-function descriptionToHtml(body: string): string | null {
+function descriptionToHtml(body: string, noteNameToSlug: Map<string, string>): string | null {
   const section = extractCabinetSection(body);
   if (!section) return null;
-  const md = stripWikilinks(section);
+  const md = resolveWikilinks(section, noteNameToSlug);
   return marked.parse(md) as string;
 }
 
@@ -263,6 +269,21 @@ async function main() {
 
   console.log(`Found ${files.length} notes in Prints & Drawings`);
 
+  // Pre-pass: build note-basename → slug map so Cabinet wikilinks can be resolved to site URLs
+  const noteNameToSlug = new Map<string, string>();
+  const seenSlugsPre = new Set<string>();
+  for (const filePath of files) {
+    const { data } = matter(fs.readFileSync(filePath, 'utf-8'));
+    const deaccessioned = data['Deaccessioned'] ?? data['deaccessioned'];
+    if (deaccessioned && typeof deaccessioned === 'string' && deaccessioned.trim().length > 0) continue;
+    const rawTitle = String(data['Title'] ?? path.basename(filePath, '.md'));
+    const title = (!rawTitle || rawTitle === 'undefined') ? path.basename(filePath, '.md') : rawTitle;
+    const artistWikilinks = toStringArray(data['Artist'] ?? data['artist']);
+    const artistName = artistWikilinks.length > 0 ? extractWikilinkName(artistWikilinks[0]) : 'Unknown';
+    const slug = makeSlug(artistName, title, seenSlugsPre);
+    noteNameToSlug.set(path.basename(filePath, '.md'), slug);
+  }
+
   const total = files.length;
   let workNum = 0;
 
@@ -368,7 +389,7 @@ async function main() {
       catNum: data['Cat. Num.'] != null ? String(data['Cat. Num.']) : null,
       catPage: data['Cat. Page'] != null ? Number(data['Cat. Page']) : null,
       focus,
-      description: descriptionToHtml(content),
+      description: descriptionToHtml(content, noteNameToSlug),
       images,
     };
 
