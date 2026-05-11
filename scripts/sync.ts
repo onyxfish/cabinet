@@ -260,6 +260,7 @@ async function main() {
   const manifest = loadManifest();
   const stats = { works: 0, skipped: 0, images: { uploaded: 0, skipped: 0 } };
   const seenSlugs = new Set<string>();
+  const writtenPaths = new Set<string>();
 
   // Glob all .md files in Prints & Drawings
   const files: string[] = [];
@@ -395,14 +396,27 @@ async function main() {
 
     const outPath = path.join(CONTENT_DIR, `${slug}.json`);
     fs.writeFileSync(outPath, JSON.stringify(work, null, 2));
+    writtenPaths.add(outPath);
     process.stdout.write('\n');
     stats.works++;
+  }
+
+  // Remove stale JSON files left over from renamed or deleted works
+  let purged = 0;
+  for (const existing of fs.readdirSync(CONTENT_DIR)) {
+    if (!existing.endsWith('.json')) continue;
+    const fullPath = path.join(CONTENT_DIR, existing);
+    if (!writtenPaths.has(fullPath)) {
+      fs.rmSync(fullPath);
+      console.log(`  purged stale file: ${existing}`);
+      purged++;
+    }
   }
 
   saveManifest(manifest);
 
   console.log(`\n✓ Sync complete`);
-  console.log(`  Works:  ${stats.works} written, ${stats.skipped} skipped`);
+  console.log(`  Works:  ${stats.works} written, ${stats.skipped} skipped, ${purged} purged`);
   console.log(`  Images: ${stats.images.uploaded} written, ${stats.images.skipped} unchanged`);
 }
 
