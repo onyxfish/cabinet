@@ -771,6 +771,23 @@
         margin-bottom: 0;
     }
 
+    .description :global(blockquote) {
+        position: relative;
+        margin: 1.1em 0 1.25em;
+        padding: 0.1em 0 0.1em 1.1em;
+        border-left: 2px solid var(--accent-lt);
+    }
+
+    .description :global(blockquote p) {
+        margin-bottom: 0.7em;
+        font-style: italic;
+        line-height: 1.45;
+    }
+
+    .description :global(blockquote p:last-child) {
+        margin-bottom: 0;
+    }
+
     .description :global(a) {
         color: var(--text-dim);
         text-decoration: underline;
