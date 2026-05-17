@@ -129,13 +129,23 @@ function extractWikilinkPath(raw: string): string | null {
   return match ? match[1].trim() : null;
 }
 
+// Filename → absolute path index, built once at startup by scanning the vault
+const vaultImageIndex = new Map<string, string>();
+
+async function buildVaultImageIndex() {
+  for await (const f of glob('**/*.{jpg,jpeg,png,tif,tiff,webp}', { cwd: VAULT_ROOT })) {
+    const filename = path.basename(f);
+    if (!vaultImageIndex.has(filename)) {
+      vaultImageIndex.set(filename, path.join(VAULT_ROOT, f));
+    }
+  }
+}
+
 function resolveImagePath(wikilink: string): string | null {
   const linkPath = extractWikilinkPath(wikilink);
   if (!linkPath) return null;
-  // linkPath is like "Collections/Media/PXL_20230824.jpg"
   const filename = path.basename(linkPath);
-  const abs = path.join(VAULT_ROOT, 'Media', filename);
-  return fs.existsSync(abs) ? abs : null;
+  return vaultImageIndex.get(filename) ?? null;
 }
 
 // Treat only actual boolean true or the string "true"/"yes"/"checked" as true
@@ -257,6 +267,7 @@ async function resolveImages(
 async function main() {
   fs.mkdirSync(CONTENT_DIR, { recursive: true });
 
+  await buildVaultImageIndex();
   const manifest = loadManifest();
   const stats = { works: 0, skipped: 0, images: { uploaded: 0, skipped: 0 } };
   const seenSlugs = new Set<string>();
